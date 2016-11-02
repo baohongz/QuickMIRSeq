@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link href="package/d3/nv.d3.css" rel="stylesheet" type="text/css">
+    <script src="package/d3/d3.js" charset="utf-8"></script>
+    <script src="package/d3/nv.d3.js"></script>
+</head>
+</body>
+<div id='canvas1' style='width:100%'>
+  <svg style='height:540px' />
+</div>
+<div id="dataset" style="display:none;">
+[
+	{
+	"key":"Perfect",
+	"values":[[0,3932077,"SRR1803389"],[1,9186988,"SRR1803390"],[2,5121111,"SRR1803391"],[3,19788075,"SRR1803392"],[4,2538737,"SRR1803393"],[5,3800303,"SRR1803394"],[6,1686119,"SRR1803395"],[7,3084065,"SRR1803396"],[8,322659,"SRR1803397"],[9,4117576,"SRR1803398"],[10,2996881,"SRR1803399"],[11,442440,"SRR1803400"],[12,1706256,"SRR1803401"],[13,1825774,"SRR1803402"],[14,509079,"SRR1803403"],[15,2685801,"SRR1803404"],[16,2961722,"SRR1803405"],[17,480499,"SRR1803406"],[18,2994730,"SRR1803407"],[19,217965,"SRR1803408"],[20,3932077,"SRR1803389"],[21,9186988,"SRR1803390"],[22,5121111,"SRR1803391"],[23,19788075,"SRR1803392"],[24,2538737,"SRR1803393"],[25,3800303,"SRR1803394"],[26,1686119,"SRR1803395"],[27,3084065,"SRR1803396"],[28,322659,"SRR1803397"],[29,4117576,"SRR1803398"],[30,2996881,"SRR1803399"],[31,442440,"SRR1803400"],[32,1706256,"SRR1803401"],[33,1825774,"SRR1803402"],[34,509079,"SRR1803403"],[35,2685801,"SRR1803404"],[36,2961722,"SRR1803405"],[37,480499,"SRR1803406"],[38,2994730,"SRR1803407"],[39,217965,"SRR1803408"]]
+	},
+	{
+	"key":"Mismatch",
+	"values":[[0,811065],[1,1857064],[2,2224899],[3,8206819],[4,477191],[5,822362],[6,869863],[7,1538272],[8,79254],[9,2022145],[10,1499251],[11,103382],[12,800893],[13,839709],[14,143497],[15,1281109],[16,1405937],[17,150225],[18,1419438],[19,110094],[20,811065],[21,1857064],[22,2224899],[23,8206819],[24,477191],[25,822362],[26,869863],[27,1538272],[28,79254],[29,2022145],[30,1499251],[31,103382],[32,800893],[33,839709],[34,143497],[35,1281109],[36,1405937],[37,150225],[38,1419438],[39,110094]]
+	}
+]
+</div>
+
+<script type="text/javascript">
+var dataset = d3.select('#dataset').text().replace(/^\s+|\s+$/g, '');;
+var data = JSON.parse(dataset);
+
+nv.addGraph(function() {
+	var chart = nv.models.stackedAreaChart()
+		.x(function(d) {
+			return d[0]
+		}) //We can modify the data accessor functions...
+		.y(function(d) {
+			return d[1]
+		}) //...in case your data is formatted differently.
+		.useInteractiveGuideline(true) //Tooltips which show all data points. Very nice!
+		.duration(300)
+		.controlLabels({
+			stacked: "Stacked"
+		});
+
+
+	chart.xAxis
+		.tickFormat(function(d) {
+			if (!data[0].values[d]) {
+				return d;
+			} else {
+				return data[0].values[d][2];
+			}
+		});
+
+	chart.yAxis
+		.tickFormat(d3.format(',.3s'));
+
+	d3.select('#canvas1 svg')
+		.datum(data)
+		.call(chart);
+
+	nv.utils.windowResize(chart.update);
+
+	return chart;
+});
+
+</script>
+</body>
+</html>

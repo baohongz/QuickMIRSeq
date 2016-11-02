@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link href="package/d3/nv.d3.css" rel="stylesheet" type="text/css">
+    <script src="package/d3/d3.js" charset="utf-8"></script>
+    <script src="package/d3/nv.d3.js"></script>
+</head>
+</body>
+
+<div id='canvas1' style='width:100%'>
+  <svg style='height:540px' />
+</div>
+<div id="dataset" style="display:none;">
+[
+	{
+	"key":"filtered_no",
+	"values":[[0,681,"SRR1803389"],[1,793,"SRR1803390"],[2,486,"SRR1803391"],[3,500,"SRR1803392"],[4,771,"SRR1803393"],[5,836,"SRR1803394"],[6,347,"SRR1803395"],[7,415,"SRR1803396"],[8,419,"SRR1803397"],[9,377,"SRR1803398"],[10,356,"SRR1803399"],[11,441,"SRR1803400"],[12,348,"SRR1803401"],[13,378,"SRR1803402"],[14,396,"SRR1803403"],[15,379,"SRR1803404"],[16,362,"SRR1803405"],[17,387,"SRR1803406"],[18,402,"SRR1803407"],[19,377,"SRR1803408"],[20,681,"SRR1803389"],[21,793,"SRR1803390"],[22,486,"SRR1803391"],[23,500,"SRR1803392"],[24,771,"SRR1803393"],[25,836,"SRR1803394"],[26,347,"SRR1803395"],[27,415,"SRR1803396"],[28,419,"SRR1803397"],[29,377,"SRR1803398"],[30,356,"SRR1803399"],[31,441,"SRR1803400"],[32,348,"SRR1803401"],[33,378,"SRR1803402"],[34,396,"SRR1803403"],[35,379,"SRR1803404"],[36,362,"SRR1803405"],[37,387,"SRR1803406"],[38,402,"SRR1803407"],[39,377,"SRR1803408"]]
+	},
+	{
+	"key":"filtered_yes",
+	"values":[[0,442],[1,470],[2,391],[3,426],[4,462],[5,472],[6,316],[7,363],[8,318],[9,339],[10,316],[11,316],[12,318],[13,330],[14,309],[15,330],[16,315],[17,303],[18,352],[19,304],[20,442],[21,470],[22,391],[23,426],[24,462],[25,472],[26,316],[27,363],[28,318],[29,339],[30,316],[31,316],[32,318],[33,330],[34,309],[35,330],[36,315],[37,303],[38,352],[39,304]]
+	}
+]
+</div>
+
+<script type="text/javascript">
+var dataset = d3.select('#dataset').text().replace(/^\s+|\s+$/g, '');;
+var data = JSON.parse(dataset);
+
+nv.addGraph(function() {
+	var chart = nv.models.multiBarChart()
+		.x(function(d) {
+			return d[0]
+		}) //We can modify the data accessor functions...
+		.y(function(d) {
+			return d[1]
+		}) //...in case your data is formatted differently.
+		.reduceXTicks(true)   //If 'false', every single x-axis tick label will be rendered.
+		.rotateLabels(30)		//Angle to rotate x-axis labels.
+		.showControls(true)   //Allow user to switch between 'Grouped' and 'Stacked' mode.
+		.groupSpacing(0.1)    //Distance between each group of bars.
+	;
+
+
+	chart.xAxis
+		.tickFormat(function(d) {
+			if (!data[0].values[d]) {
+				return d;
+			} else {
+				return data[0].values[d][2];
+			}
+		});
+
+	chart.yAxis
+		.tickFormat(d3.format(',.3s'));
+
+	d3.select('#canvas1 svg')
+		.datum(data)
+		.call(chart);
+
+	nv.utils.windowResize(chart.update);
+
+	return chart;
+});
+
+</script>
+</body>
+</html>

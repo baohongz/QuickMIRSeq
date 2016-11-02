@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link href="package/d3/nv.d3.css" rel="stylesheet" type="text/css">
+    <script src="package/d3/d3.js" charset="utf-8"></script>
+    <script src="package/d3/nv.d3.js"></script>
+</head>
+</body>
+<div id='canvas1' style='width:100%'>
+  <svg style='height:540px' />
+</div>
+<div id="dataset" style="display:none;">
+[
+	{
+	"key":"withAdapter",
+	"values":[[0,7478664,"SRR1803389"],[1,14168014,"SRR1803390"],[2,26266227,"SRR1803391"],[3,77844177,"SRR1803392"],[4,6273597,"SRR1803393"],[5,11387218,"SRR1803394"],[6,15515576,"SRR1803395"],[7,29651035,"SRR1803396"],[8,3244411,"SRR1803397"],[9,31524130,"SRR1803398"],[10,22088654,"SRR1803399"],[11,3203746,"SRR1803400"],[12,18553278,"SRR1803401"],[13,21661810,"SRR1803402"],[14,2869229,"SRR1803403"],[15,25108030,"SRR1803404"],[16,21732910,"SRR1803405"],[17,2823679,"SRR1803406"],[18,19690018,"SRR1803407"],[19,23107647,"SRR1803408"]]
+	},
+	{
+	"key":"noAdapter",
+	"values":[[0,3024114],[1,2227563],[2,1351075],[3,7961714],[4,2160692],[5,2949916],[6,771215],[7,1154028],[8,279715],[9,1381133],[10,1004670],[11,230783],[12,839834],[13,1069564],[14,183830],[15,1066011],[16,976595],[17,243813],[18,883754],[19,2109071]]
+	}
+]
+</div>
+
+<script type="text/javascript">
+var dataset = d3.select('#dataset').text().replace(/^\s+|\s+$/g, '');;
+var data = JSON.parse(dataset);
+
+nv.addGraph(function() {
+	var chart = nv.models.stackedAreaChart()
+		.x(function(d) {
+			return d[0]
+		}) //We can modify the data accessor functions...
+		.y(function(d) {
+			return d[1]
+		}) //...in case your data is formatted differently.
+		.useInteractiveGuideline(true) //Tooltips which show all data points. Very nice!
+		.duration(300)
+		.controlLabels({
+			stacked: "Stacked"
+		});
+
+
+	chart.xAxis
+		.tickFormat(function(d) {
+			if (!data[0].values[d]) {
+				return d;
+			} else {
+				return data[0].values[d][2];
+			}
+		});
+
+	chart.yAxis
+		.tickFormat(d3.format(',.3s'));
+
+	d3.select('#canvas1 svg')
+		.datum(data)
+		.call(chart);
+
+	nv.utils.windowResize(chart.update);
+
+	return chart;
+});
+
+</script>
+</body>
+</html>

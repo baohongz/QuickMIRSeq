@@ -1,0 +1,73 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link href="package/d3/nv.d3.css" rel="stylesheet" type="text/css">
+    <script src="package/d3/d3.js" charset="utf-8"></script>
+    <script src="package/d3/nv.d3.js"></script>
+</head>
+</body>
+<div id='canvas1' style='width:100%'>
+  <svg style='height:540px' />
+</div>
+<div id="dataset" style="display:none;">
+[
+	{
+	"key":"TrimPass",
+	"values":[[0,8754510,"SRR1803389"],[1,15308667,"SRR1803390"],[2,16935689,"SRR1803391"],[3,72392344,"SRR1803392"],[4,6456414,"SRR1803393"],[5,9200758,"SRR1803394"],[6,11632387,"SRR1803395"],[7,24802266,"SRR1803396"],[8,2767270,"SRR1803397"],[9,25329381,"SRR1803398"],[10,19905483,"SRR1803399"],[11,2952010,"SRR1803400"],[12,14060682,"SRR1803401"],[13,15731392,"SRR1803402"],[14,1156196,"SRR1803403"],[15,19100830,"SRR1803404"],[16,18777962,"SRR1803405"],[17,2266346,"SRR1803406"],[18,16142915,"SRR1803407"],[19,5736808,"SRR1803408"]]
+	},
+	{
+	"key":"Short",
+	"values":[[0,1748268],[1,1086910],[2,10681613],[3,13413547],[4,1977875],[5,5136376],[6,4654404],[7,6002797],[8,756856],[9,7575882],[10,3187841],[11,482519],[12,5332430],[13,6999982],[14,1896863],[15,7073211],[16,3931543],[17,801146],[18,4430857],[19,19479910]]
+	},
+	{
+	"key":"noAdapter",
+	"values":[[0,3024114],[1,2227563],[2,1351075],[3,7961714],[4,2160692],[5,2949916],[6,771215],[7,1154028],[8,279715],[9,1381133],[10,1004670],[11,230783],[12,839834],[13,1069564],[14,183830],[15,1066011],[16,976595],[17,243813],[18,883754],[19,2109071]]
+	}
+]
+</div>
+
+<script type="text/javascript">
+var dataset = d3.select('#dataset').text().replace(/^\s+|\s+$/g, '');;
+var data = JSON.parse(dataset);
+
+nv.addGraph(function() {
+	var chart = nv.models.stackedAreaChart()
+		.x(function(d) {
+			return d[0]
+		}) //We can modify the data accessor functions...
+		.y(function(d) {
+			return d[1]
+		}) //...in case your data is formatted differently.
+		.useInteractiveGuideline(true) //Tooltips which show all data points. Very nice!
+		.duration(300)
+		.controlLabels({
+			stacked: "Stacked"
+		});
+
+
+	chart.xAxis
+		.tickFormat(function(d) {
+			if (!data[0].values[d]) {
+				return d;
+			} else {
+				return data[0].values[d][2];
+			}
+		});
+
+	chart.yAxis
+		.tickFormat(d3.format(',.3s'));
+
+	d3.select('#canvas1 svg')
+		.datum(data)
+		.call(chart);
+
+	nv.utils.windowResize(chart.update);
+
+	return chart;
+});
+
+</script>
+</body>
+</html>

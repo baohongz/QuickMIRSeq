@@ -1,0 +1,88 @@
+#
+### general run configuration file
+#
+
+# directory for FASTQ files
+FASTQ_DIR=/hpc/grid/ngsws/btx_clinical/zhaos25/QAmiRSeq_Test/GSE60900_rat/fastq
+#FASTQ_DIR=/hpc/grid/ngsws/btx_clinical/zhaos25/William_miRNA/output/trimmed
+
+# suffix for fastq:  fq.gz or fastq.gz or fastq  or fq
+FASTQ_SUFFIX=fastq
+
+# target folder
+OUTPUT_FOLDER=output
+
+# stranded or nonstranded. #0: nonstranded;  1: forward strandness;  2: reverse strandness
+STRAND=1
+
+# the CPU cores, recommended 8 to 12 if multiple cores are available
+CPU=8
+
+# 5- and 3- end extension
+EXTENSION5=4
+EXTENSION3=5
+
+# for clean reads with adapter trimmed, set it to no.
+CUTADAPT_REQUIRED=no
+
+# parameter for adapter cutting
+CUTADAPT_PARAMETER="-a TGGAATTCTCGGGTGCCAAGG -m 16" 
+
+# filter out reads with low abundance (optional strongly recommended)
+FILTER_NOISE_READS=yes
+
+# subtract reads mapped to miRNA with mismatches but have better hits in reference genome
+# (recommended, but optional)
+REFINE_MISMATACH_READS=yes
+
+# run unique reads versus the library size analysis (optional, only recommended for comprehensive analysis)
+# The results are written into uniqReads.library.csv
+UNIQUE_LIBRARY_ANALYSIS=yes
+
+# The offset (5 and 3 end) analysis of mapped reads
+# If set to yes, please change the 5' and 3' end extension to 4 and 5, respectively
+OFFSET_ANALYSIS=yes
+
+# run 5' and 3' end extension evaluation (optional,only recommended for comprehensive analysis)
+# To explore the impact of extension on miRNA read mapping
+# File extension.evaluation.csv record the number of mapped mirna reads
+RUN_EXTENSION_EVALUATION=yes
+
+# keep intermediate files or not 
+keepTemp=yes
+
+# sample source
+SPECIES=rat
+
+#
+### filtering noise miRNA reads
+# 
+# A read is filtered out if 
+#    1)the % of samples having ZERO counts is above the threshold (a fraction)
+#    2)the number of samples having ZERO counts is above the threshold (an integer)
+#  AND
+##   The average read count across SAMPLES is below the cuttoff
+# recommended 0.60-0.80 (80%)
+
+# yuo can define the meaning of ZERO, not necessarily 0
+ZEROCOUNT_THRESHOLD=0
+ZEROCOUNT_SAMPLE_THRESHOLD=0.60
+AVG_READ_THRESHOLD=2
+
+#
+### Species-specific miRNA database
+#
+
+# Bowtie index for miRNA, hairpin, smallRNA, and mRNA
+#RNA_BOWTIE_INDEX=/hpc/grid/shared/ngsapp/miRge/miRge.seqLibs/human2
+#RNA_BOWTIE_INDEX=/hpc/grid/shared/ngsapp/miRge/database/rat/db_stranded_0
+RNA_BOWTIE_INDEX=/hpc/grid/shared/ngsapp/QAmiRSeq/database/rat/db_stranded_0
+
+#Bowtie index for reference genome
+GENOME_BOWTIE_INDEX=/hpc/grid/shared/ngsdb/bowtie/rn6
+
+# MINIMUM and MAXIMUM miRNA length,used to filter reads too short or too long when mapped to miRNA
+MIN_MIRNA_LENGTH=16
+MAX_MIRNA_LENGTH=28
+
+

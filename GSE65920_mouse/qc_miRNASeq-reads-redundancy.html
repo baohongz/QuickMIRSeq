@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link href="package/d3/nv.d3.css" rel="stylesheet" type="text/css">
+    <script src="package/d3/d3.js" charset="utf-8"></script>
+    <script src="package/d3/nv.d3.js"></script>
+</head>
+</body>
+
+<div id='canvas1' style='width:100%'>
+  <svg style='height:600px' />
+</div>
+<br>
+<b>"Click-n-Drag" on the bottom plot to generate a sliding window. Moving the window by "Click-n-Drag" in the middle. Changing the size of the window by "Click-n-Drag" on the side bars. Clicking outside the sliding window to remove the window.</b>
+<div id="dataset" style="display:none;">
+[
+	{
+	"key":"total",
+	"values":[[0,4.38,"SRR1803389"],[1,8.57,"SRR1803390"],[2,7.55,"SRR1803391"],[3,9.15,"SRR1803392"],[4,3.69,"SRR1803393"],[5,3.84,"SRR1803394"],[6,6.72,"SRR1803395"],[7,8.18,"SRR1803396"],[8,7.36,"SRR1803397"],[9,7.75,"SRR1803398"],[10,7.38,"SRR1803399"],[11,7.79,"SRR1803400"],[12,6.61,"SRR1803401"],[13,6.38,"SRR1803402"],[14,5.20,"SRR1803403"],[15,7.16,"SRR1803404"],[16,7.80,"SRR1803405"],[17,7.92,"SRR1803406"],[18,7.35,"SRR1803407"],[19,3.20,"SRR1803408"]]
+	},
+	{
+	"key":"miRNA",
+	"values":[[0,308.25],[1,524.76],[2,219.10],[3,555.14],[4,193.24],[5,252.13],[6,117.62],[7,165.29],[8,79.91],[9,277.06],[10,251.67],[11,99.11],[12,161.39],[13,153.67],[14,124.27],[15,195.79],[16,223.44],[17,130.36],[18,214.05],[19,36.09]]
+	},
+	{
+	"key":"smallRNA",
+	"values":[[0,15.36],[1,24.40],[2,33.61],[3,57.43],[4,8.68],[5,10.76],[6,28.40],[7,34.98],[8,6.75],[9,25.28],[10,17.60],[11,6.61],[12,17.72],[13,18.33],[14,7.27],[15,21.30],[16,20.26],[17,7.84],[18,19.40],[19,11.92]]
+	},
+	{
+	"key":"unaligned",
+	"values":[[0,1.82],[1,1.96],[2,2.67],[3,3.45],[4,1.78],[5,1.73],[6,3.44],[7,4.61],[8,6.77],[9,4.20],[10,4.39],[11,7.31],[12,4.12],[13,3.92],[14,2.03],[15,4.21],[16,4.61],[17,5.72],[18,4.03],[19,2.40]]
+	}
+]
+</div>
+
+<script type="text/javascript">
+var dataset = d3.select('#dataset').text().replace(/^\s+|\s+$/g, '');;
+var data = JSON.parse(dataset);
+
+
+nv.addGraph(function() {
+  var chart = nv.models.lineWithFocusChart()
+		.x(function(d) {
+            return d[0]
+        }) //We can modify the data accessor functions...
+        .y(function(d) {
+            return d[1]
+        }) //...in case your data is formatted differently.
+  ;
+
+    chart.xAxis
+        .tickFormat(function(d) {
+            if (!data[0].values[d]) {
+                return d;
+            } else {
+                return data[0].values[d][2];
+            }
+        });
+
+    chart.x2Axis
+        .tickFormat(function(d) {
+            if (!data[0].values[d]) {
+                return d;
+            } else {
+                return data[0].values[d][2];
+            }
+        });
+
+    chart.yAxis
+        .tickFormat(d3.format(',.1f'));
+
+	chart.yAxis.axisLabel("Ratio (#Reads/#unique_Reads)")
+
+    chart.y2Axis
+        .tickFormat(d3.format(',.1f'));
+
+  d3.select('#canvas1 svg')
+      .datum(data)
+      .transition().duration(500)
+      .call(chart);
+
+  nv.utils.windowResize(chart.update);
+
+  return chart;
+});
+</script>
+</body>
+</html>

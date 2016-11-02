@@ -1,0 +1,742 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<!-- SlickGrid -->
+<link rel="stylesheet" type="text/css" href="package/fancyBox-v2.1.5/jquery.fancybox.css" media="screen">
+<link rel="stylesheet" type="text/css" href="package/SlickGrid/slick.grid.css"/>
+<link rel="stylesheet" type="text/css" href="package/SlickGrid/css/smoothness/jquery-ui-1.11.4.css"/>
+<link rel="stylesheet" type="text/css" href="package/SlickGrid/examples/examples.css"/>
+<link rel="stylesheet" type="text/css" href="package/SlickGrid/controls/slick.pager.css"/>
+<link rel="stylesheet" type="text/css" href="package/d3/d3.parcoords.css">
+
+</head>
+
+<body>
+
+<script type="text/javascript" src="package/jquery.js"></script>
+<script type="text/javascript" src="package/jquery.ui.js"></script>
+<script type="text/javascript" src="package/jquery.ui.sortable.js"></script>
+<script type="text/javascript" src="package/jquery.ui.button.js"></script>
+<script type="text/javascript" src="package/jquery.ui.dialog.js"></script>
+<script type="text/javascript" src="package/fancyBox-v2.1.5/jquery.fancybox.js"></script>
+<script type="text/javascript" src="package/d3/d3.min.js"></script>
+<script type="text/javascript" src="package/d3/d3.parcoords.js"></script>
+<script type="text/javascript" src="package/SlickGrid/divgrid.js"></script>
+<script type="text/javascript" src="package/SlickGrid/lib/jquery.event.drag-2.2.js"></script>
+<script type="text/javascript" src="package/SlickGrid/slick.core.js"></script>
+<script type="text/javascript" src="package/SlickGrid/slick.grid.js"></script>
+<script type="text/javascript" src="package/SlickGrid/slick.dataview.js"></script>
+<script type="text/javascript" src="package/SlickGrid/controls/slick.pager.js"></script>
+
+<!-- End SlickGrid -->
+<script type="text/javascript">
+    $(document).ready( function() {
+        $("a#single_image").fancybox();
+});
+</script>
+
+<style>
+.ui-widget, .tick {
+  font-family: arial;
+  font-size: 8pt;    
+}
+
+body, html {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-size: 12px;
+  background-color: white;
+}
+body {
+  overflow-y: scroll;
+}
+
+#p_grid, #p_pager {
+  width: 100%;
+}
+#p_grid {
+  bottom: 0;
+  height: 400px;
+}
+#p_pager {
+  bottom: 400px;
+  height: 20px;
+}
+.slick-row:hover {
+  font-weight: bold;
+  color: #069;
+}
+.button2 {
+	background: white url('package/SlickGrid/images/header-columns-over-bg.gif') repeat-x center bottom;
+	border: 2px solid lightblue;
+}
+</style>
+
+</head>
+
+<div id="p_dataset" style="display:none;">
+Sample	readLengthDist	readAnnoDist	Filter	total_reads	t_miRNA	t_hairpin	t_smallRNA	t_mRNA	t_unaligned	t_miRNA_mismatch	miRNA_detected	uniq_reads	u_miRNA	u_hairpin	u_smallRNA	u_mRNA	u_unaligned	u_miRNA_mismatch
+SRR1561057	SRR1561057	SRR1561057	no	2759082	1664737	8092	167705	32592	885956	189200	528	132845	12459	530	9313	25275	85268	9625
+SRR1561058	SRR1561058	SRR1561058	no	2437044	1666983	7466	142673	21706	598216	205260	530	107447	12718	465	7904	17014	69346	9915
+SRR1561059	SRR1561059	SRR1561059	no	2237847	1386830	7524	110782	35469	697242	151391	529	120491	11129	464	7700	28692	72506	8347
+SRR1561060	SRR1561060	SRR1561060	no	2770248	1868917	10049	122426	19899	748957	197144	546	98708	12754	510	7012	15698	62734	9768
+SRR1561061	SRR1561061	SRR1561061	no	2522721	1510121	6472	151321	38956	815851	183425	535	129577	12176	488	8745	29849	78319	9431
+SRR1561062	SRR1561062	SRR1561062	no	2856390	1672976	10438	181179	33600	958197	180775	527	131508	12457	583	9239	28068	81161	9530
+SRR1561063	SRR1561063	SRR1561063	no	3377058	1633926	8211	256107	132273	1346541	187530	516	237391	12442	554	16583	65837	141975	9576
+SRR1561064	SRR1561064	SRR1561064	no	3370069	1470761	5819	242257	149195	1502037	181835	516	224089	12233	475	16428	52903	142050	9452
+SRR1561065	SRR1561065	SRR1561065	no	2735196	1746199	10424	131236	41502	805835	181739	538	137642	12319	603	8674	34404	81642	9371
+SRR1561066	SRR1561066	SRR1561066	no	1744773	1132228	4851	88489	22122	497083	122989	505	84942	9884	340	6263	17797	50658	7379
+SRR1561067	SRR1561067	SRR1561067	no	3591019	1725679	8904	265084	112205	1479147	186174	533	206654	12555	557	16433	49038	128071	9682
+SRR1561068	SRR1561068	SRR1561068	no	2744626	1403106	5971	174829	67949	1092771	172311	530	154394	12237	472	11994	32563	97128	9376
+SRR1561069	SRR1561069	SRR1561069	no	2763126	1843673	9291	122929	28676	758557	211985	539	122170	12753	486	7614	23352	77965	9836
+SRR1561070	SRR1561070	SRR1561070	no	2204346	1307224	6653	145935	27965	716569	148184	517	103863	11212	447	8362	19688	64154	8570
+SRR1561071	SRR1561071	SRR1561071	no	2155685	1364913	5418	126876	32510	625968	163235	517	118896	11488	449	7690	25523	73746	8814
+SRR1561072	SRR1561072	SRR1561072	no	2821219	1756142	10002	153649	41323	860103	201170	536	142001	12550	504	9164	31082	88701	9630
+SRR1561073	SRR1561073	SRR1561073	no	1799058	1073470	4473	136536	28543	556036	117905	499	98626	10044	359	7348	22558	58317	7617
+SRR1561074	SRR1561074	SRR1561074	no	3203796	1608665	6842	224003	123161	1241125	192479	519	203108	12517	544	15494	47950	126603	9664
+SRR1561075	SRR1561075	SRR1561075	no	1961382	1285677	5832	89329	20741	559803	136718	519	93101	10416	407	6295	17079	58904	7813
+SRR1561076	SRR1561076	SRR1561076	no	2679910	1564424	7922	193325	65278	848961	180573	518	162913	12241	497	10996	43849	95330	9443
+SRR1561077	SRR1561077	SRR1561077	no	2670990	1297167	5553	164851	83388	1120031	164790	523	187119	11944	442	12366	47940	114427	9185
+SRR1561078	SRR1561078	SRR1561078	no	2094276	1405520	7007	95675	13633	572441	143286	517	79775	11056	412	6111	11389	50807	8372
+SRR1561079	SRR1561079	SRR1561079	no	3215449	1480968	6375	240247	108595	1379264	166038	521	183441	12140	443	15211	39938	115709	9350
+SRR1561080	SRR1561080	SRR1561080	no	2822104	1248100	4934	231095	142057	1195918	145795	499	208626	11098	456	16704	59085	121283	8442
+SRR1561081	SRR1561081	SRR1561081	no	1179519	669884	2704	59064	15672	432195	65750	475	60380	7072	249	4646	13570	34843	4854
+SRR1561082	SRR1561082	SRR1561082	no	2204453	1388250	5002	168571	28754	613876	142614	506	106319	10687	394	8158	21840	65240	8103
+SRR1561083	SRR1561083	SRR1561083	no	1883429	1116743	4963	100752	10578	650393	119546	498	73078	10433	375	6136	8592	47542	7897
+SRR1561084	SRR1561084	SRR1561084	no	2271689	1410394	7484	134056	18929	700826	154723	516	93501	11528	488	7686	14398	59401	8846
+SRR1561085	SRR1561085	SRR1561085	no	2612831	1626752	9276	195838	27779	753186	165593	529	112439	11685	527	8609	21573	70045	8845
+SRR1561086	SRR1561086	SRR1561086	no	1004111	588816	2152	49162	10596	353385	57528	464	49317	6518	226	3974	9366	29233	4455
+SRR1561087	SRR1561087	SRR1561087	no	2130955	1115598	3921	102448	31925	877063	117244	507	110636	10018	370	7346	26154	66748	7513
+SRR1561088	SRR1561088	SRR1561088	no	1684566	848871	2704	84860	58005	690126	76992	505	120170	7567	297	8661	31778	71867	5251
+SRR1561089	SRR1561089	SRR1561089	no	2719506	1290629	5745	213444	93659	1116029	131762	506	171550	10584	431	12779	42412	105344	7929
+SRR1561090	SRR1561090	SRR1561090	no	1584729	935342	5788	109100	18960	515539	102028	491	82608	9748	390	6842	15721	49907	7281
+SRR1561091	SRR1561091	SRR1561091	no	1186167	527112	1760	70440	39619	547236	50696	466	78797	6104	227	6997	16325	49144	4088
+SRR1561092	SRR1561092	SRR1561092	no	4456085	1314621	4751	233969	59362	2843382	129167	519	138262	10605	382	11470	27408	88397	7916
+SRR1561093	SRR1561093	SRR1561093	no	3035796	1816793	9268	184824	26550	998361	201744	521	118972	12958	515	9292	20064	76143	10084
+SRR1561094	SRR1561094	SRR1561094	no	1045602	628363	2300	56852	13818	344269	64441	466	53590	6647	230	4580	10872	31261	4520
+SRR1561095	SRR1561095	SRR1561095	no	2407805	1516892	7668	188617	31395	663233	151175	515	108612	11498	464	9009	22690	64951	8682
+SRR1561096	SRR1561096	SRR1561096	no	2446249	1485969	7033	153059	27976	772212	162123	515	104342	11746	460	8710	19618	63808	9039
+SRR1561097	SRR1561097	SRR1561097	no	1214868	774250	3215	58927	15174	363302	77720	480	61428	7382	280	4719	12791	36256	5135
+SRR1561098	SRR1561098	SRR1561098	no	2835311	1457914	5803	229252	84897	1057445	146568	510	155776	10974	447	13457	33224	97674	8269
+SRR1561099	SRR1561099	SRR1561099	no	1832036	1107413	6455	112886	16848	588434	123821	517	84454	10175	412	6614	13708	53545	7664
+SRR1561100	SRR1561100	SRR1561100	no	881773	525808	2039	48555	10821	294550	51078	481	43187	6246	201	4008	8513	24219	4191
+SRR1561101	SRR1561101	SRR1561101	no	3024344	1575928	6246	231198	100385	1110587	152908	519	180961	11342	484	14079	46527	108529	8530
+SRR1561102	SRR1561102	SRR1561102	no	2328853	1315866	5872	142958	29225	834932	139400	517	112991	11126	439	7997	23906	69523	8464
+SRR1561103	SRR1561103	SRR1561103	no	1090047	509393	1772	60740	28290	489852	48953	453	64240	6000	221	5800	12448	39771	4017
+SRR1561104	SRR1561104	SRR1561104	no	2998537	1258134	6343	277256	132540	1324264	127038	516	197413	10566	456	16009	54948	115434	7868
+SRR1561057	SRR1561057	SRR1561057	yes	2647631	1659214	7737	161749	8959	809972	184278	469	32566	7848	227	4230	2585	17676	5513
+SRR1561058	SRR1561058	SRR1561058	yes	2350805	1660443	7175	137939	6329	538919	199288	474	30193	7873	226	3877	2167	16050	5533
+SRR1561059	SRR1561059	SRR1561059	yes	2142015	1382662	7243	106595	8391	637124	147795	475	29818	7490	227	3929	2577	15595	5185
+SRR1561060	SRR1561060	SRR1561060	yes	2695175	1863314	9731	118755	5874	697501	192288	480	29452	8007	234	3666	2141	15404	5624
+SRR1561061	SRR1561061	SRR1561061	yes	2414674	1504109	6150	145877	10645	747893	177968	470	31169	7719	220	4152	2781	16297	5424
+SRR1561062	SRR1561062	SRR1561062	yes	2747482	1667371	10042	175132	6926	888011	175896	471	31606	7829	240	4184	2203	17150	5485
+SRR1561063	SRR1561063	SRR1561063	yes	3149599	1628472	7833	240398	63091	1209805	182731	466	37691	7826	229	5246	3853	20537	5497
+SRR1561064	SRR1561064	SRR1561064	yes	3131112	1464737	5522	223400	92493	1344960	176431	466	34886	7718	223	4855	2895	19195	5423
+SRR1561065	SRR1561065	SRR1561065	yes	2622022	1740793	9991	126154	8578	736506	177053	474	31875	7793	238	4203	2621	17020	5429
+SRR1561066	SRR1561066	SRR1561066	yes	1682910	1129035	4683	85397	6055	457740	120175	462	25894	6998	185	3486	2196	13029	4824
+SRR1561067	SRR1561067	SRR1561067	yes	3384370	1719705	8516	247789	62229	1346131	180901	472	36860	7832	225	5011	3108	20684	5489
+SRR1561068	SRR1561068	SRR1561068	yes	2603679	1397121	5640	165150	35767	1000001	166981	467	33844	7703	208	4569	2649	18715	5365
+SRR1561069	SRR1561069	SRR1561069	yes	2665165	1837943	8994	118713	6860	692655	206953	474	30959	7939	230	3855	2301	16634	5593
+SRR1561070	SRR1561070	SRR1561070	yes	2125051	1302869	6388	141015	10167	664612	144275	463	30319	7450	214	4100	2717	15838	5197
+SRR1561071	SRR1561071	SRR1561071	yes	2056828	1359817	5157	122514	8569	560771	158599	464	29395	7519	221	3911	2511	15233	5245
+SRR1561072	SRR1561072	SRR1561072	yes	2701207	1750636	9696	147846	11644	781385	196359	466	32082	7906	240	4208	2939	16789	5547
+SRR1561073	SRR1561073	SRR1561073	yes	1723767	1069999	4292	132567	7658	509251	114760	459	27676	6996	190	3869	2300	14321	4867
+SRR1561074	SRR1561074	SRR1561074	yes	2999440	1602388	6433	208517	73571	1108531	186829	473	36176	7813	224	5000	3423	19716	5468
+SRR1561075	SRR1561075	SRR1561075	yes	1890696	1282079	5607	86337	5276	511397	133558	470	27283	7227	201	3523	2059	14273	4999
+SRR1561076	SRR1561076	SRR1561076	yes	2539281	1559102	7622	185547	21592	765418	175841	474	33368	7789	229	4618	3293	17439	5477
+SRR1561077	SRR1561077	SRR1561077	yes	2499872	1291430	5274	155034	36019	1012115	159630	475	34793	7602	217	4745	3321	18908	5322
+SRR1561078	SRR1561078	SRR1561078	yes	2036190	1401069	6773	92706	3613	532029	139338	468	26587	7377	206	3377	1644	13983	5109
+SRR1561079	SRR1561079	SRR1561079	yes	3031985	1475788	6108	224264	67003	1258822	161480	469	34374	7739	206	4785	2838	18806	5436
+SRR1561080	SRR1561080	SRR1561080	yes	2610964	1243261	4644	213065	80449	1069545	141443	461	34807	7346	214	5044	3689	18514	5095
+SRR1561081	SRR1561081	SRR1561081	yes	1138206	668353	2604	57181	3563	406505	64443	449	21011	5638	151	2889	1675	10658	3618
+SRR1561082	SRR1561082	SRR1561082	yes	2122233	1384375	4800	164033	8680	560345	139190	463	29712	7291	210	4115	2515	15581	5082
+SRR1561083	SRR1561083	SRR1561083	yes	1832143	1112517	4758	97559	3199	614110	115690	462	27068	7120	195	3339	1372	15042	4904
+SRR1561084	SRR1561084	SRR1561084	yes	2201038	1405028	7183	129609	6332	652886	149825	468	29962	7472	218	3811	2167	16294	5206
+SRR1561085	SRR1561085	SRR1561085	yes	2524227	1622053	8929	190740	7860	694645	161487	469	31165	7683	229	4173	2403	16677	5336
+SRR1561086	SRR1561086	SRR1561086	yes	971959	587449	2069	47676	2279	332486	56341	435	18629	5225	144	2576	1178	9506	3336
+SRR1561087	SRR1561087	SRR1561087	yes	2040460	1111533	3734	98408	7423	819362	113596	463	29054	6880	199	3751	2379	15845	4732
+SRR1561088	SRR1561088	SRR1561088	yes	1583145	846677	2563	79249	27804	626852	75123	458	28106	5729	169	3987	3078	15143	3689
+SRR1561089	SRR1561089	SRR1561089	yes	2558702	1286922	5490	202824	51009	1012457	128516	463	34151	7295	214	4843	3038	18761	5035
+SRR1561090	SRR1561090	SRR1561090	yes	1524585	931674	5560	105277	4811	477263	98722	453	26499	6778	198	3555	1865	14103	4632
+SRR1561091	SRR1561091	SRR1561091	yes	1122681	525951	1678	65858	24261	504933	49699	433	22631	5006	148	3285	1775	12417	3142
+SRR1561092	SRR1561092	SRR1561092	yes	4327419	1310680	4521	225211	32985	2754022	125747	468	33910	7192	194	4661	2820	19043	4942
+SRR1561093	SRR1561093	SRR1561093	yes	2935568	1809886	8913	178626	8262	929881	195467	471	32898	7955	228	4199	2426	18090	5600
+SRR1561094	SRR1561094	SRR1561094	yes	1010481	626976	2227	54974	4630	321674	63255	434	20324	5355	160	2822	1908	10079	3414
+SRR1561095	SRR1561095	SRR1561095	yes	2324230	1512378	7386	183213	10456	610797	147244	470	30889	7627	220	4298	2672	16072	5296
+SRR1561096	SRR1561096	SRR1561096	yes	2363350	1480300	6732	147614	10216	718488	156973	464	31331	7591	214	4079	2697	16750	5320
+SRR1561097	SRR1561097	SRR1561097	yes	1173222	772499	3098	56993	3937	336695	76222	450	21628	5752	168	2910	1757	11041	3740
+SRR1561098	SRR1561098	SRR1561098	yes	2691884	1453704	5537	217933	51664	963046	142887	463	34758	7396	212	4958	3258	18934	5133
+SRR1561099	SRR1561099	SRR1561099	yes	1770114	1103384	6210	109375	4667	546478	120188	455	28088	7009	201	3534	1821	15523	4845
+SRR1561100	SRR1561100	SRR1561100	yes	855743	524597	1966	47090	3916	278174	50030	449	18405	5087	129	2613	1754	8822	3188
+SRR1561101	SRR1561101	SRR1561101	yes	2855679	1571074	5940	219273	53357	1006035	148673	473	35809	7501	219	5074	3547	19468	5178
+SRR1561102	SRR1561102	SRR1561102	yes	2235613	1310303	5597	138089	6941	774683	134361	462	29553	7236	210	3884	2267	15956	5011
+SRR1561103	SRR1561103	SRR1561103	yes	1042551	508264	1687	57635	16838	458127	47977	433	21853	4944	138	3127	1608	12036	3108
+SRR1561104	SRR1561104	SRR1561104	yes	2804383	1254323	6081	261971	74823	1207185	123744	465	35480	7243	222	5212	3787	19016	4977
+</div>
+
+<div id="p_canvas1" class="parcoords" style="height: 240px;"></div>
+
+<div id="p_canvas1_inst" style="padding:4px;font-size:10pt;">
+<b>Controls:</b> 
+<b>Brush</b> - Drag vertically along an axis.
+<b>Remove Brush</b> - Tap the axis background.
+<b>Reorder Axes</b> - Drag an axis label horizontally.
+<b>Color Lines by Values</b> - Click on an axis label.
+<b>Invert Axis</b> - Double click on an axis label.
+<b>Remove Axis</b> - Drag axis label off the left or the right edge.
+<b>Tooltip</b> - Click on a line to show values, move out of the canvas to remove tooptip.
+</div>
+<hr>
+<div id="dialog_Sample" title="Sample" style="display:none;">
+  <p>Sample identifier provided by user</p>
+</div>
+<div id="dialog_readLengthDist" title="readLengthDist" style="display:none;">
+  <p>The length distribution of clean miRNA-seq reads</p>
+</div>
+<div id="dialog_readAnooDist" title="readAnooDist" style="display:none;">
+  <p>The distribution of all annotated miRNA-seq reads</p>
+</div>
+<div id="dialog_Filter" title="Filter" style="display:none;">
+  <p>Whether noisy reads are excluded from the analysis or not</p>
+</div>
+<div id="dialog_total_reads" title="total_reads" style="display:none;">
+  <p>The total number of reads ready for alignment in this sample</p>
+</div>
+<div id="dialog_t_miRNA" title="t_miRNA" style="display:none;">
+  <p>The total number of reads mapped to miRNA</p>
+</div>
+<div id="dialog_t_hairpin" title="t_hairpin" style="display:none;">
+  <p>The total number of reads mapped to hairpin</p>
+</div>
+<div id="dialog_t_smallRNA" title="t_smallRNA" style="display:none;">
+  <p>The total number of reads mapped to small RNA</p>
+</div>
+<div id="dialog_t_mRNA" title="t_mRNA" style="display:none;">
+  <p>The total number of reads mapped to mRNA</p>
+</div>
+<div id="dialog_t_unaligned" title="t_unaligned" style="display:none;">
+  <p>The total number of unmapped reads</p>
+</div>
+<div id="dialog_t_miRNA_mismatch" title="t_miRNA_mismatch" style="display:none;">
+  <p>The total number of reads mapped to miRNA with mismatches</p>
+</div>
+<div id="dialog_miRNA_detected" title="miRNA_detected" style="display:none;">
+  <p>The total number of detected miRNA</p>
+</div>
+<div id="dialog_uniq_reads" title="uniq_reads" style="display:none;">
+  <p>The unique number of reads mapped to miRNA</p>
+</div>
+<div id="dialog_u_miRNA" title="u_miRNA" style="display:none;">
+  <p>The unique number of reads mapped to mRNA</p>
+</div>
+<div id="dialog_u_hairpin" title="u_hairpin" style="display:none;">
+  <p>The unique number of reads mapped to hairpin</p>
+</div>
+<div id="dialog_u_smallRNA" title="u_smallRNA" style="display:none;">
+  <p>The unique number of reads mapped to small RNA</p>
+</div>
+<div id="dialog_u_mRNA" title="u_mRNA" style="display:none;">
+  <p>The unique number of reads mapped to mRNA</p>
+</div>
+<div id="dialog_u_unaligned" title="u_unaligned" style="display:none;">
+  <p>The unique number of unmapped reads</p>
+</div>
+<div id="dialog_u_miRNA_mismatch" title="u_miRNA_mismatch" style="display:none;">
+  <p>The unique number of reads mapped to miRNA with mismatches</p>
+</div>
+<div id="dialog_id" title="id" style="display:none;">
+  <p>ID automatically generated by the tool for internal control of uniqueness of records</p>
+</div>
+<table border=0 cellpadding=3 width=100%>
+<tr>
+<td width=20% nowrap>Search: <input type="text" id="p_txtSearch" value=""></td>
+<td width=70% align=center><b>Right click on a column header to show the explanation.</b></td>
+<td width=10% nowrap><button class=button2><b>Show or hide QC plot</b></button></td>
+</tr>
+</table>
+
+<div id="p_grid"></div>
+<div id="p_pager"></div>
+
+
+<script type="text/javascript">
+
+$("button").click(function(){
+	$("#p_canvas1").toggle();
+	$("#p_canvas1_inst").toggle();
+	if($('#p_canvas1').is(':hidden')) {
+		$("#p_grid").height(800);
+	} else {
+		$("#p_grid").height(400);
+	}
+	p_grid.resizeCanvas()
+});
+
+var color_set = d3.scale.linear().range(["#3182bd", "#f33"]);
+
+var parcoords = d3.parcoords()("#p_canvas1")
+	.alpha(0.4)
+	.mode("queue") // progressive rendering
+	.height(240)
+	.margin({
+		top: 36,
+		left: 0,
+		right: 0,
+		bottom: 16
+	});
+
+// load tsv file and create the chart
+
+var p_dataset = d3.select('#p_dataset').text().replace(/^\s+|\s+$/g, '');
+var p_data = d3.tsv.parse(p_dataset);
+
+
+p_data.forEach(function(d, i) {
+	d.id = d.id || i;
+});
+
+parcoords
+	.data(p_data)
+	.hideAxis(["id", "readLengthDist", "readAnnoDist"])
+	.render()
+	.margin({
+		top: 40,
+		right: 20,
+		bottom: 20,
+		left: 50
+	})
+	.reorderable()
+	.brushMode("1D-axes");
+
+// setting up grid
+var p_cols_keys = d3.keys(p_data[0]);
+var p_columns = p_cols_keys.map(function(key, i) {
+	return {
+		id: key,
+		name: key,
+		field: key,
+		sortable: true
+	}
+});
+
+
+// update_colors(d3.keys(p_data[0])[2]);
+
+// click label to activate coloring
+parcoords.svg.selectAll(".dimension")
+	.on("click", update_colors)
+	.selectAll(".label")
+	.style("font-size", "10px"); // change font sizes of selected label
+
+
+//add hover event
+d3.select("#p_canvas1 svg")
+	.on("click", function() {
+		var mousePosition = d3.mouse(this);
+		highlightLineOnClick(mousePosition, true); //true will also add tooltip
+	})
+	.on("mouseout", function() {
+		cleanTooltip();
+		parcoords.unhighlight();
+	});
+
+
+// update color and font weight of chart based on axis selection
+// modified from here: https://syntagmatic.github.io/parallel-coordinates/
+function update_colors(dimension) {
+
+console.log(dimension);
+
+	// change the fonts to bold
+	parcoords.svg.selectAll(".dimension")
+		.style("font-weight", "normal")
+		.filter(function(d) {
+			return d == dimension;
+		})
+		.style("font-weight", "bold");
+
+	// change color of lines
+	// set domain of color scale
+	var values0 = getActiveData().map(function(d) {
+		return d[dimension];
+	});
+	values = values0.map(function(d) {return parseFloat(d)});
+
+	if (isNaN(values[0])) {
+		var n = {},j=1,i;
+		for(i = 0; i < values0.length; i++) {
+			if (!n[values0[i]]) {
+				n[values0[i]] = j++; 
+			}
+		}
+		for(i = 0; i < values.length; i++) {
+			values[i] = n[values0[i]];
+		}
+	}
+
+	color_set.domain([d3.min(values), d3.max(values)]);
+
+	// change colors for each line
+//	parcoords.color(function(d) {
+//		return color_set([d[dimension]])
+//	}).render();
+
+	parcoords.color(function(d,i) {
+		return color_set(values[i])
+	}).render();
+};
+
+
+// Add highlight for every line on click
+function getCentroids(cd) {
+	// this function returns centroid points for cd. I had to change the source
+	// for parallelcoordinates and make compute_centroids public.
+	// I assume this should be already somewhere in graph and I don't need to recalculate it
+	// but I couldn't find it so I just wrote this for now
+	var margins = parcoords.margin();
+	var graphCentPts = [];
+
+	cd.forEach(function(d) {
+
+		var initCenPts = parcoords.compute_centroids(d).filter(function(d, i) {
+			return i % 2 == 0;
+		});
+
+		// move points based on margins
+		var cenPts = initCenPts.map(function(d) {
+			return [d[0] + margins["left"], d[1] + margins["top"]];
+		});
+
+		graphCentPts.push(cenPts);
+	});
+
+	return graphCentPts;
+}
+
+function getActiveData() {
+	// I'm pretty sure this data is already somewhere in graph
+	if (parcoords.brushed() != false) return parcoords.brushed();
+	return parcoords.data();
+}
+
+function isOnLine(startPt, endPt, testPt, tol) {
+	// check if test point is close enough to a line
+	// between startPt and endPt. close enough means smaller than tolerance
+	var x0 = testPt[0];
+	var y0 = testPt[1];
+	var x1 = startPt[0];
+	var y1 = startPt[1];
+	var x2 = endPt[0];
+	var y2 = endPt[1];
+	var Dx = x2 - x1;
+	var Dy = y2 - y1;
+	var delta = Math.abs(Dy * x0 - Dx * y0 - x1 * y2 + x2 * y1) / Math.sqrt(Math.pow(Dx, 2) + Math.pow(Dy, 2));
+	//console.log(delta);
+	if (delta <= tol) return true;
+	return false;
+}
+
+function findAxes(testPt, cenPts) {
+	// finds between which two axis the mouse is
+	var x = testPt[0];
+	var y = testPt[1];
+
+	// make sure it is inside the range of x
+	if (cenPts[0][0] > x) return false;
+	if (cenPts[cenPts.length - 1][0] < x) return false;
+
+	// find between which segment the point is
+	for (var i = 0; i < cenPts.length; i++) {
+		if (cenPts[i][0] > x) return i;
+	}
+}
+
+function cleanTooltip() {
+	// removes any object under #tooltip is
+	parcoords.svg.selectAll("#tooltip")
+		.remove();
+}
+
+function addTooltip(clicked, clickedCenPts) {
+
+	// add tooltip to multiple clicked lines
+	var clickedDataSet = [];
+	var margins = parcoords.margin();
+	var dim = parcoords.dimensions();
+
+	// get all the values into a single list
+	// I'm pretty sure there is a better way to write this is Javascript
+	for (var i = 0; i < clicked.length; i++) {
+//console.log(clicked[i]);
+		for (var j = 0; j < clickedCenPts[i].length; j++) {
+// Baohong: fix the bug here, should match displaying axis
+//			var text = d3.values(clicked[i])[j];
+			var text = String(clicked[i][dim[j]]); // It must be String type
+			// not clean at all!
+			var x = clickedCenPts[i][j][0] - margins.left;
+			var y = clickedCenPts[i][j][1] - margins.top;
+			clickedDataSet.push([x, y, text]);
+		}
+	};
+
+
+	// add rectangles
+	var fontSize = 14;
+	var padding = 2;
+	var rectHeight = fontSize + 2 * padding; //based on font size
+
+	parcoords.svg.selectAll("rect[id='tooltip']")
+		.data(clickedDataSet).enter()
+		.append("rect")
+		.attr("x", function(d) {
+			return d[0] - d[2].length * 5;
+		})
+		.attr("y", function(d) {
+			return d[1] - rectHeight + 2 * padding;
+		})
+		.attr("rx", "2")
+		.attr("ry", "2")
+		.attr("id", "tooltip")
+		.attr("fill", "grey")
+		.attr("opacity", 0.9)
+		.attr("width", function(d) {
+			return d[2].length * 10;
+		})
+		.attr("height", rectHeight);
+
+	// add text on top of rectangle
+	parcoords.svg.selectAll("text[id='tooltip']")
+		.data(clickedDataSet).enter()
+		.append("text")
+		.attr("x", function(d) {
+			return d[0];
+		})
+		.attr("y", function(d) {
+			return d[1];
+		})
+		.attr("id", "tooltip")
+		.attr("fill", "white")
+		.attr("text-anchor", "middle")
+		.attr("font-size", fontSize)
+		.text(function(d) {
+			return d[2];
+		})
+}
+
+function getClickedLines(mouseClick) {
+	var clicked = [];
+	var clickedCenPts = [];
+
+	// find which data is activated right now
+	var activeData = getActiveData();
+
+	// find centriod points
+	var graphCentPts = getCentroids(activeData);
+
+	if (graphCentPts.length == 0) return false;
+
+	// find between which axes the point is
+	var axeNum = findAxes(mouseClick, graphCentPts[0]);
+	if (!axeNum) return false;
+
+	graphCentPts.forEach(function(d, i) {
+		if (isOnLine(d[axeNum - 1], d[axeNum], mouseClick, 2)) {
+			clicked.push(activeData[i]);
+			clickedCenPts.push(graphCentPts[i]); // for tooltip
+		}
+	});
+
+	return [clicked, clickedCenPts]
+}
+
+
+function highlightLineOnClick(mouseClick, drawTooltip) {
+
+	var clicked = [];
+	var clickedCenPts = [];
+
+	clickedData = getClickedLines(mouseClick);
+
+	if (clickedData && clickedData[0].length != 0) {
+
+		clicked = clickedData[0];
+		clickedCenPts = clickedData[1];
+
+		// highlight clicked line
+		parcoords.highlight(clicked);
+
+		if (drawTooltip) {
+			// clean if anything is there
+			cleanTooltip();
+			// add tooltip
+			addTooltip(clicked, clickedCenPts);
+		}
+
+	}
+}
+
+
+// SlickGrid
+var p_options = {
+	enableCellNavigation: true,
+	rowHeight: 55,
+	multiColumnSort: false
+};
+
+p_columns[1] = {
+    id: "readLengthDist",
+    name: "readLengthDist",
+    width: 100,
+    field: "readLengthDist",
+    formatter: linkFormatter = function(row, cell, value, columnDef, dataContext) {
+        return '<a id=single_image href=graphs/' + value + '.readLengthDistribution.png><img src=graphs/' + value + '.readLengthDistribution.png width=100px height=50px></a>';
+    }
+};
+
+p_columns[2] = {
+    id: "readAnnoDist",
+    name: "readAnnoDist",
+    width: 100,
+    field: "readAnnoDist",
+    formatter: linkFormatter = function(row, cell, value, columnDef, dataContext) {
+        return '<a id=single_image href=graphs/' + value + '.readAnnotDistribution.png><img src=graphs/' + value + '.readAnnotDistribution.png width=100px height=50px></a>';
+    }
+};
+
+
+var p_dataView = new Slick.Data.DataView();
+var p_grid = new Slick.Grid("#p_grid", p_dataView, p_columns, p_options);
+var p_pager = new Slick.Controls.Pager(p_dataView, p_grid, $("#p_pager"));
+
+// wire up model events to drive the grid
+p_dataView.onRowCountChanged.subscribe(function(e, args) {
+	p_grid.updateRowCount();
+	p_grid.render();
+});
+
+p_dataView.onRowsChanged.subscribe(function(e, args) {
+	p_grid.invalidateRows(args.rows);
+	p_grid.render();
+});
+
+
+// column sorting
+var p_sortcol = p_cols_keys[0];
+var p_sortdir = 1;
+
+function p_comparer(a, b) {
+
+    // Baohong Zhang: fix to sort numberic values
+    if ($.isNumeric(a[p_sortcol]) && $.isNumeric(b[p_sortcol])) {
+		a[p_sortcol] = parseFloat(a[p_sortcol], 10);
+		b[p_sortcol] = parseFloat(b[p_sortcol], 10);
+	}
+
+	var x = a[p_sortcol],
+		y = b[p_sortcol];
+	return (x == y ? 0 : (x > y ? 1 : -1));
+}
+
+// click header to sort grid column
+p_grid.onSort.subscribe(function(e, args) {
+	p_sortdir = args.sortAsc ? 1 : -1;
+	p_sortcol = args.sortCol.field;
+
+	p_dataView.sort(p_comparer, args.sortAsc);
+});
+
+// highlight row in chart
+// Baohong: Added Tooltip
+p_grid.onMouseEnter.subscribe(function(e, args) {
+//	var d = parcoords.brushed() || p_data;
+	var r = p_grid.getCellFromEvent(e).row;
+	var i = p_dataView.getIdxById(p_grid.getDataItem(r)["id"])  // Baohong: sorting changes underlying data order
+
+	var d = parcoords.brushed() || p_data;
+	parcoords.highlight([d[i]]);
+	// clean if anything is there
+	cleanTooltip();
+	// add tooltip
+	addTooltip([d[i]], getCentroids([d[i]]));
+});
+
+p_grid.onMouseLeave.subscribe(function(e, args) {
+	parcoords.unhighlight();
+	cleanTooltip();
+});
+
+p_grid.onHeaderContextMenu.subscribe(function(e, args) {
+	e.preventDefault();
+	var theDialog = $("#dialog_"+args.column.id).dialog();
+	theDialog.dialog("option", "position", [e.pageX,e.pageY]);
+	theDialog.dialog("open");
+});
+
+// update grid on brush
+parcoords.on("brush", function(d) {
+	p_gridUpdate(d);
+});
+
+
+var p_searchString = "";
+
+function p_myFilter(d, args) {
+	if (args.p_searchString != "" && d[p_columns[0].name].toUpperCase().indexOf(args.p_searchString.toUpperCase()) == -1 &&
+		d[p_columns[1].name].toUpperCase().indexOf(args.p_searchString.toUpperCase()) == -1 &&
+		d[p_columns[2].name].toUpperCase().indexOf(args.p_searchString.toUpperCase()) == -1 &&
+		d[p_columns[3].name].toUpperCase().indexOf(args.p_searchString.toUpperCase()) == -1) {
+		return false;
+	}
+	return true;
+}
+
+$("#p_txtSearch").keyup(function(e) {
+	Slick.GlobalEditorLock.cancelCurrentEdit();
+
+	// clear on Esc
+	if (e.which == 27) {
+		this.value = "";
+	}
+
+	p_searchString = this.value;
+	p_updateFilter();
+});
+
+function p_updateFilter() {
+	p_dataView.setFilterArgs({
+		p_searchString: p_searchString
+	});
+	p_dataView.refresh();
+}
+
+function p_gridUpdate(d) {
+	p_dataView.beginUpdate();
+	p_dataView.setItems(d);
+
+	p_dataView.setFilterArgs({
+		p_searchString: p_searchString
+	});
+
+	p_dataView.setFilter(p_myFilter);
+
+	p_dataView.endUpdate();
+};
+
+// fill grid with data
+p_gridUpdate(p_data);
+
+//window.onload = function() {
+//	if(!window.location.hash) {
+//		window.location = window.location + '#loaded';
+//		window.location.reload();
+//	}
+//}
+</script>
+
+</body>
+</html>
