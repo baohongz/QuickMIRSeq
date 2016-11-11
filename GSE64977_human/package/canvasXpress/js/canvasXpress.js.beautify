@@ -1,5 +1,5 @@
 /**
- * CanvasXpress 12.5 - JavaScript Canvas Library
+ * CanvasXpress 12.8 - JavaScript Canvas Library
  * 
  * Copyright (c) 2009-2016 Isaac Neuhaus
  * 
@@ -1640,8 +1640,8 @@ var CanvasXpress = function(f, d, a, b, e, g, c) {
 		this.href = location.href;
 		this.protocol = this.href.split(":")[0];
 		this.meta = {
-			version: 12.5,
-			buildDate: "10-27-2016",
+			version: 12.8,
+			buildDate: "11-11-2016",
 			ids: {},
 			start: new Date().getTime(),
 			data: false,
@@ -2248,6 +2248,7 @@ CanvasXpress.prototype.initDOM = function() {
 		this.meta.system = {
 			browser: a[0],
 			browserVersion: a[1],
+			isjQuery: typeof $ === "function" ? true : false,
 			isIE: this.browser == "IE" ? true : false,
 			isTouchScreen: "ontouchstart" in window || "onmsgesturechange" in window || navigator.maxTouchPoints
 		}
@@ -2294,47 +2295,47 @@ CanvasXpress.prototype.initInterface = function() {
 		}
 	}(this);
 	this.loadFile = function(a) {
-		return function(j, c) {
+		return function(j, c, l) {
 			a.removeMenus();
 			a.resetConfigurator();
-			var g = j.target.files[0];
+			var g = j.target ? j.target.files[0] : j.files[0];
 			var k = g.type;
 			var d = g.name.split(".");
 			var i = new FileReader();
 			if (k == "image/png") {
-				var h = function(m, e) {
-					var n = "";
-					for (var l = 0; l < 4; l++) {
-						n += String.fromCharCode(m.getUint8(e + l))
-					}
-					return n == "tEXt"
-				};
-				var f = function(n, l, e) {
+				var h = function(n, e) {
 					var o = "";
-					for (var m = 0; m < e; m++) {
-						o += String.fromCharCode(n.getUint8(l + m))
+					for (var m = 0; m < 4; m++) {
+						o += String.fromCharCode(n.getUint8(e + m))
 					}
-					return o.match(/CanvasXpress/)
+					return o == "tEXt"
+				};
+				var f = function(o, m, e) {
+					var p = "";
+					for (var n = 0; n < e; n++) {
+						p += String.fromCharCode(o.getUint8(m + n))
+					}
+					return p.match(/CanvasXpress/)
 				};
 				i.onload = function() {
-					var p = new DataView(this.result);
-					var l = p.getUint32(8);
-					var e = p.getUint32(8 + 4 + 4 + l + 4);
-					if (h(p, 8 + 4 + 4 + l + 4 + 4) && f(p, 8 + 4 + 4 + l + 4 + 4 + 4, e)) {
-						var o = p.getUint32(8 + 4 + 4 + l + 4 + 4 + 4 + e + 4);
-						var q = 8 + 4 + 4 + l + 4 + 4 + 4 + e + 4 + 4 + 4;
-						var n = "";
-						for (var m = 0; m < o; m++) {
-							n += String.fromCharCode(p.getUint8(q + m))
+					var q = new DataView(this.result);
+					var m = q.getUint32(8);
+					var e = q.getUint32(8 + 4 + 4 + m + 4);
+					if (h(q, 8 + 4 + 4 + m + 4 + 4) && f(q, 8 + 4 + 4 + m + 4 + 4 + 4, e)) {
+						var p = q.getUint32(8 + 4 + 4 + m + 4 + 4 + 4 + e + 4);
+						var r = 8 + 4 + 4 + m + 4 + 4 + 4 + e + 4 + 4 + 4;
+						var o = "";
+						for (var n = 0; n < p; n++) {
+							o += String.fromCharCode(q.getUint8(r + n))
 						}
-						n = n.replace("ReproducibleResearch\0", "");
-						var r = JSON.parse(n);
+						o = o.replace("ReproducibleResearch\0", "");
+						var s = JSON.parse(o);
 						if (c) {
-							return r
+							return s
 						}
-						r.uploadFile = true;
+						s.uploadFile = true;
 						a.remoteServiceType = "file";
-						a.updateRemoteData(r)
+						a.updateRemoteData(s, l)
 					} else {
 						alert("Oooops! Not a CanvasXpress Image")
 					}
@@ -2345,11 +2346,11 @@ CanvasXpress.prototype.initInterface = function() {
 				if (b == "json") {
 					i.onload = function() {
 						try {
-							var l = JSON.parse(i.result);
-							l.uploadFile = true;
+							var m = JSON.parse(i.result);
+							m.uploadFile = true;
 							a.remoteServiceType = "file";
-							a.updateRemoteData(l)
-						} catch (m) {
+							a.updateRemoteData(m, l)
+						} catch (n) {
 							alert("Oooops! Not a CanvasXpress json file")
 						}
 					}
@@ -2357,16 +2358,16 @@ CanvasXpress.prototype.initInterface = function() {
 					if (b == "txt" || b == "csv" || b == "tsv" || b == "tab") {
 						i.onload = function() {
 							try {
-								var q = i.result;
-								var l = q.match(/,/g).length;
-								var n = q.match(/\t/g).length;
-								var m = b == "csv" && l > n ? "," : "\t";
-								var o = a.delimitedToArray(q, m, true);
-								o.renderTo = d[0];
-								o.uploadFile = true;
+								var r = i.result;
+								var m = r.match(/,/g).length;
+								var o = r.match(/\t/g).length;
+								var n = b == "csv" && m > o ? "," : "\t";
+								var p = a.delimitedToArray(r, n, true);
+								p.renderTo = d[0];
+								p.uploadFile = true;
 								a.remoteServiceType = "file";
-								a.updateRemoteData(o)
-							} catch (p) {
+								a.updateRemoteData(p, l)
+							} catch (q) {
 								alert("Oooops! Not a CanvasXpress delimited file")
 							}
 						}
@@ -2798,7 +2799,7 @@ CanvasXpress.prototype.initInterface = function() {
 				info: e || false,
 				afterRender: [
 // Baohong : redundant operation for subsequent plots
-//					["setDimensions", [a.originalWidth, a.originalHeight, true]]
+//                  ["setDimensions", [a.originalWidth, a.originalHeight, true]]
 				]
 			}
 		}
@@ -2872,8 +2873,8 @@ CanvasXpress.prototype.initInterface = function() {
 						}]);
 						break;
 // Baohong: can easily flood the stack when zoom in-and-out
-	                    case "setIndicesAfterWheelEvent":
-                        break; 
+                        case "setIndicesAfterWheelEvent":
+                        break;
 
 					default:
 						CanvasXpress.stack[this.target].afterRender.push([h, b])
@@ -4027,6 +4028,8 @@ CanvasXpress.prototype.initConfig = function(a) {
 		this.isMultidimensionalData = false;
 		this.heatmapAutoAdjust = false;
 		this.meta.config.keys.push("heatmapAutoAdjust");
+		this.heatmapLabelSizeAutoAdjust = true;
+		this.meta.config.keys.push("heatmapLabelSizeAutoAdjust");
 		this.heatmapCellBox = true;
 		this.meta.config.keys.push("heatmapCellBox");
 		this.heatmapCellBoxColor = "rgb(220,220,220)";
@@ -4883,23 +4886,25 @@ CanvasXpress.prototype.initConfig = function(a) {
 };
 CanvasXpress.prototype.initColor = function() {
 	this.validateColor = function(f, d) {
-		f = f.toString();
-		var a = (/rgb\((\d{1,3}),(\d{1,3}),(\d{1,3})\)/).exec(f);
-		var b = (/rgba\((\d{1,3}),(\d{1,3}),(\d{1,3}),([0-9\.]+)\)/).exec(f);
-		var e = (/^#?([0-9abcdef]{6})/i).exec(f);
-		if (this.colorNames.hasOwnProperty(f)) {
-			f = this.hexToRgb(this.colorNames[f])
-		} else {
-			if (a != null) {
-				f = a[0]
+		if (f) {
+			f = f.toString();
+			var a = (/rgb\((\d{1,3}),(\d{1,3}),(\d{1,3})\)/).exec(f);
+			var b = (/rgba\((\d{1,3}),(\d{1,3}),(\d{1,3}),([0-9\.]+)\)/).exec(f);
+			var e = (/^#?([0-9abcdef]{6})/i).exec(f);
+			if (this.colorNames.hasOwnProperty(f)) {
+				f = this.hexToRgb(this.colorNames[f])
 			} else {
-				if (b != null) {
-					f = b[0]
+				if (a != null) {
+					f = a[0]
 				} else {
-					if (e != null) {
-						f = this.hexToRgb(e[0])
+					if (b != null) {
+						f = b[0]
 					} else {
-						f = false
+						if (e != null) {
+							f = this.hexToRgb(e[0])
+						} else {
+							f = false
+						}
 					}
 				}
 			}
@@ -9094,7 +9099,7 @@ CanvasXpress.prototype.initRangeAlgorithms = function() {
 		var b = Math.floor(d / k) * k;
 		var g = Math.ceil(j / k) * k;
 		for (var e = b; e <= g; e += k) {
-			h.push(e)
+			h.push(this.correctPrecisionBug(e))
 		}
 		return h
 	};
@@ -9144,7 +9149,7 @@ CanvasXpress.prototype.initRangeAlgorithms = function() {
 			}
 		}
 		for (var f = e.lmin; f <= e.lmax; f += e.lstep) {
-			h.push(f)
+			h.push(this.correctPrecisionBug(f))
 		}
 		return h
 	};
@@ -9261,7 +9266,7 @@ CanvasXpress.prototype.initRangeAlgorithms = function() {
 			T++
 		}
 		for (var U = L.lmin; U <= L.lmax; U += L.lstep) {
-			H.push(U)
+			H.push(this.correctPrecisionBug(U))
 		}
 		return H
 	};
@@ -9334,7 +9339,7 @@ CanvasXpress.prototype.initRangeAlgorithms = function() {
 			q = t
 		}
 		for (var u = x * j; u <= w * j; u += j) {
-			l.push(u)
+			l.push(this.correctPrecisionBug(u))
 		}
 		return l
 	};
@@ -11498,65 +11503,65 @@ CanvasXpress.prototype.initConfigUtils = function() {
 			N--
 		}
 	};
-	this.drawBoxPlot = function(N, I, B, x, E, A, H, G, O, F, Q) {
-		var n = function(a) {
-			return G == "vertical" ? B - ((a - H) * A) : I + ((a - H) * A)
+	this.drawBoxPlot = function(P, J, C, y, F, B, I, H, Q, G, S, N) {
+		var x = function(a) {
+			return H == "vertical" ? C - ((a - I) * B) : J + ((a - I) * B)
 		};
-		var P = this.backgroundType.match(/window/i) ? this.foregroundWindow : this.foreground;
-		var C = this.variableSeparationFactor / 2;
-		var L = x / 2;
-		var g = L / 2;
-		var e = g / 2;
-		var M = x / this.boxPlotOutliersRatio;
-		var k = [];
-		if (G == "vertical") {
-			for (var K = 0; K < N.length; K++) {
-				var D = I + L;
-				var y = [];
-				for (var J = 0; J < 5; J++) {
-					y.push(n(N[K][J]))
+		var R = this.backgroundType.match(/window/i) ? this.foregroundWindow : this.foreground;
+		var D = this.variableSeparationFactor / 2;
+		var M = y / 2;
+		var k = M / 2;
+		var e = k / 2;
+		var O = y / this.boxPlotOutliersRatio;
+		var n = [];
+		if (H == "vertical") {
+			for (var L = 0; L < P.length; L++) {
+				var E = J + M;
+				var A = [];
+				for (var K = 0; K < 5; K++) {
+					A.push(x(P[L][K]))
 				}
-				this.addArea(this.rectangle(I + C, y[3], x - this.variableSeparationFactor, y[2] - y[3], O[K], this.objectBorderColor ? this.objectBorderColor : O[K], F[K], false, false, true), Q[K]);
-				this.drawLine("line", I + C, y[4], I + (x - C), y[4], this.boxplotMedianColor, this.boxplotMedianWidth, "butt", false, false, true);
-				this.errorBar(D, y[2], D, y[0], -L, P);
-				this.errorBar(D, y[3], D, y[1], -L, P);
+				this.addArea(this.rectangle(J + D, A[3], y - this.variableSeparationFactor, A[2] - A[3], Q[L], this.objectBorderColor ? this.objectBorderColor : Q[L], G[L], false, false, true), S[L]);
+				this.drawLine("line", J + D, A[4], J + (y - D), A[4], this.boxplotMedianColor, this.boxplotMedianWidth, "butt", false, false, true);
+				this.errorBar(E, A[2], E, A[0], -M, R);
+				this.errorBar(E, A[3], E, A[1], -M, R);
 				if (this.boxplotMean) {
-					this.rectangle(D - e, n(N[K][6]) - e, g, g, this.boxplotMeanColor, this.boxplotMeanColorBorder)
+					this.rectangle(E - e, x(P[L][6]) - e, k, k, this.boxplotMeanColor, this.boxplotMeanColorBorder)
 				}
-				if (N[K][5]) {
-					for (var J = 0; J < N[K][5].length; J++) {
-						this.drawShape("sphere", D, n(N[K][5][J]), M, M, O[K], P, F[K], false, false, true)
+				if (P[L][5]) {
+					for (var K = 0; K < P[L][5].length; K++) {
+						this.drawShape("sphere", E, x(P[L][5][K]), O, O, Q[L], R, G[L], false, false, true)
 					}
 				}
-				k.push([I + C + (x / 2), y[4], O[K]]);
-				I += E
+				n.push([J + D + (y / 2), A[4], this.showBoxplotOriginalData || this.showViolinBoxplot ? N : Q[L]]);
+				J += F
 			}
 		} else {
-			for (var K = 0; K < N.length; K++) {
-				var D = B + L;
-				var y = [];
-				for (var J = 0; J < 5; J++) {
-					y.push(n(N[K][J]))
+			for (var L = 0; L < P.length; L++) {
+				var E = C + M;
+				var A = [];
+				for (var K = 0; K < 5; K++) {
+					A.push(x(P[L][K]))
 				}
-				this.addArea(this.rectangle(y[2], B + C, y[3] - y[2], x - this.variableSeparationFactor, O[K], this.objectBorderColor ? this.objectBorderColor : O[K], F[K], false, false, true), Q[K]);
-				this.drawLine("line", y[4], B + C, y[4], B + (x - C), this.boxplotMedianColor, this.boxplotMedianWidth, "butt", false, false, true);
-				this.errorBar(y[2], D, y[0], D, L, P);
-				this.errorBar(y[3], D, y[1], D, L, P);
+				this.addArea(this.rectangle(A[2], C + D, A[3] - A[2], y - this.variableSeparationFactor, Q[L], this.objectBorderColor ? this.objectBorderColor : Q[L], G[L], false, false, true), S[L]);
+				this.drawLine("line", A[4], C + D, A[4], C + (y - D), this.boxplotMedianColor, this.boxplotMedianWidth, "butt", false, false, true);
+				this.errorBar(A[2], E, A[0], E, M, R);
+				this.errorBar(A[3], E, A[1], E, M, R);
 				if (this.boxplotMean) {
-					this.rectangle(n(N[K][6]) - e, D - e, g, g, this.boxplotMeanColor, this.boxplotMeanColorBorder)
+					this.rectangle(x(P[L][6]) - e, E - e, k, k, this.boxplotMeanColor, this.boxplotMeanColorBorder)
 				}
-				if (N[K][5]) {
-					for (var J = 0; J < N[K][5].length; J++) {
-						this.drawShape("sphere", n(N[K][5][J]), D, M, M, O[K], P, F[K], false, false, true)
+				if (P[L][5]) {
+					for (var K = 0; K < P[L][5].length; K++) {
+						this.drawShape("sphere", x(P[L][5][K]), E, O, O, Q[L], R, G[L], false, false, true)
 					}
 				}
-				k.push([y[4], B + C + (x / 2), O[K]]);
-				B += E
+				n.push([A[4], C + D + (y / 2), this.showBoxplotOriginalData || this.showViolinBoxplot ? N : Q[L]]);
+				C += F
 			}
 		}
 		if (this.boxplotConnect) {
-			for (var K = 0; K < k.length - 1; K++) {
-				this.drawLine("line", k[K][0], k[K][1], k[K + 1][0], k[K + 1][1], k[K + 1][2], this.boxplotConnectWidth, "butt", false, false, true)
+			for (var L = 0; L < n.length - 1; L++) {
+				this.drawLine("line", n[L][0], n[L][1], n[L + 1][0], n[L + 1][1], n[L + 1][2], this.boxplotConnectWidth, "butt", false, false, true)
 			}
 		}
 	};
@@ -20040,7 +20045,8 @@ CanvasXpress.prototype.initMenuLinks = function() {
 		}
 		if (this.graphType == "Boxplot") {
 			b.push(["Plot Data", "bpdata", "toggleAttribute", ["showBoxplotOriginalData"]]);
-			b.push(["Violin", "violinOn", "toggleAttribute", ["showViolinBoxplot"]])
+			b.push(["Violin", "violinOn", "toggleAttribute", ["showViolinBoxplot"]]);
+			b.push(["Connect Boxplot", "connects", "toggleAttribute", ["boxplotConnect"]])
 		}
 		b.push(["Sample Space", "spaceWidth", false, false, false, "getPlotAreaOneSampleSpaceMenu", []]);
 		b.push(["Sample Width", "widthSpace", false, false, false, "getPlotAreaOneSampleWidthMenu", []]);
@@ -20529,9 +20535,7 @@ CanvasXpress.prototype.initMenuLinks = function() {
 	};
 	this.getDataPointAttributesMenu = function() {
 		var a = [];
-		if (this.graphType.match(/scatter/i) || this.is3DPlot || this.graphType == "Dotplot" || (this.graphType == "Boxplot" && this.showBoxplotOriginalData) || this.graphType == "Bar") {
-			a.push(["Color By", "colors", false, false, false, "getDataPointAttributesPropertyMenu", ["colorBy"]])
-		}
+		a.push(["Color By", "colors", false, false, false, "getDataPointAttributesPropertyMenu", ["colorBy"]]);
 		if (this.graphType.match(/scatter/i) || this.is3DPlot || this.graphType == "Dotplot" || (this.graphType == "Boxplot" && this.showBoxplotOriginalData)) {
 			a.push(["Shape By", "shapes", false, false, false, "getDataPointAttributesPropertyMenu", ["shapeBy"]]);
 			a.push(["Size By", "sizes", false, false, false, "getDataPointAttributesPropertyMenu", ["sizeBy"]])
@@ -21239,7 +21243,8 @@ CanvasXpress.prototype.initMenuLinks = function() {
 		a.push(["Show JSON code", "purpleCode", "clickShowCode", []]);
 		a.push(["Reproduce", "redo", "reproduce", [], "Ctrl + Alt + R"]);
 		if (this.remoteService && this.remoteServiceType == "webService") {
-			a.push(["Save parameters to server", "disk", "saveRemote", ["params"]])
+			a.push(["Save parameters to server", "disk", "saveRemote", ["params"]]);
+			a.push(["Clear parameters from server", "deleteSaved", "clearRemote", []])
 		}
 		a.push(["-"]);
 		a.push(["Load", "add2", true, []]);
@@ -22178,7 +22183,7 @@ CanvasXpress.prototype.initToolbarTooltip = function() {
 			}
 			this.resizeMove(a, 0, 12, this.width + b, 0, 250)
 		} else {
-			if (e) {
+			if (e && a && parseInt(a.style.height) > 0) {
 				var c = this;
 				setTimeout(function() {
 					c.hideToolbar(e)
@@ -25346,13 +25351,13 @@ CanvasXpress.prototype.initBin = function() {
 	}(this)
 };
 CanvasXpress.prototype.initDataExplorer = function() {
-	this.addDataExplorer = function(p) {
-		var m = this.target + "-cX-DataExplorer";
-		var t = this.$(m);
-		if (t) {
+	this.addDataExplorer = function(f) {
+		var a = this.target + "-cX-DataExplorer";
+		var j = this.$(a);
+		if (j) {
 			return
 		}
-		var q = this.$cX("div", {
+		var g = this.$cX("div", {
 			id: this.target + "-cX-DataExplorer",
 			className: "CanvasXpressBin draggable"
 		}, {
@@ -25360,7 +25365,7 @@ CanvasXpress.prototype.initDataExplorer = function() {
 			top: "-" + (this.height - 20) + "px",
 			display: "block"
 		});
-		var f = this.$cX("img", {
+		var m = this.$cX("img", {
 			id: this.target + "-cX-DataExplorerCloseImage",
 			className: "CanvasXpressBin",
 			src: CanvasXpress.images.cancel1,
@@ -25369,125 +25374,171 @@ CanvasXpress.prototype.initDataExplorer = function() {
 		}, {
 			height: "18px"
 		});
-		var u = this.$cX("div", {
+		var h = this.$cX("div", {
 			id: this.target + "-cX-DataExplorerContainer",
 			className: "CanvasXpressBinContainer"
 		});
-		var o = this.loadFormatDataExplorerDiv();
-		var r = this.loadLayoutDataExplorerDiv();
-		var b = this.loadMetadataDataExplorerDiv();
-		var a = this.loadPropertiesDataExplorerDiv();
-		var w = this.loadOrientationDataExplorerDiv();
-		var j = this.loadGraphTypesDataExplorerDiv();
-		var n = this.loadAxesDataExplorerDiv();
-		var i = this.loadVariablesDataExplorerDiv();
-		var k = this.loadSamplesDataExplorerDiv();
-		var h = this.loadAnnotationsDataExplorerDiv();
-		var g = this.loadDescriptionsDataExplorerDiv();
-		var l = this.$("south-wrapper-" + this.target);
-		if (l) {
-			q.appendChild(f);
-			u.appendChild(o);
-			u.appendChild(r);
-			u.appendChild(b);
-			u.appendChild(this.$cX("br"));
-			u.appendChild(a);
-			u.appendChild(w);
-			u.appendChild(this.$cX("br"));
-			u.appendChild(j);
-			u.appendChild(n);
-			u.appendChild(this.$cX("br"));
-			u.appendChild(this.$cX("hr", {
+		var k = this.$("south-wrapper-" + this.target);
+		if (k) {
+			g.appendChild(m);
+			var o = this.loadDataExplorerTopPanel();
+			h.appendChild(o);
+			var i = this.$cX("img", {
+				id: this.target + "-cX-DataExplorerMinimizeImage1",
+				className: "CanvasXpressBin",
+				src: CanvasXpress.images.collapseFolder,
+				srt: CanvasXpress.images.expandFolder,
+				alt: "Collapse Variables and Sample Metadata",
+				title: "Collapse Variables and Sample Metadata"
+			}, {
+				height: "18px"
+			});
+			h.appendChild(i);
+			var n = this.loadDataExplorerMiddlePanel();
+			h.appendChild(n);
+			h.appendChild(this.$cX("br"));
+			h.appendChild(this.$cX("hr", {
 				className: "CanvasXpressDataExplorer"
 			}, {
 				width: "201px"
 			}));
-			u.appendChild(this.$cX("br"));
-			u.appendChild(this.$cX("span", {
+			var b = this.$cX("img", {
+				id: this.target + "-cX-DataExplorerMinimizeImage2",
 				className: "CanvasXpressBin",
-				innerHTML: "Variables / Data Series"
-			}));
-			u.appendChild(this.$cX("img", {
-				id: this.target + "-cX-DataExplorerSortVariables",
-				className: "CanvasXpressDataExplorer",
-				src: CanvasXpress.images.sortAsciiAsc,
-				asr: CanvasXpress.images.sortAsciiDesc,
-				params: ["sortDataExplorer"],
-				alt: "Sort Variables",
-				title: "Sort Variables"
+				src: CanvasXpress.images.collapseFolder,
+				srt: CanvasXpress.images.expandFolder,
+				alt: "Collapse Samples and Variable Metadata",
+				title: "Collapse Samples and Variable Metadata"
 			}, {
-				border: "none",
-				padding: 0
-			}));
-			u.appendChild(this.$cX("br"));
-			u.appendChild(i);
-			u.appendChild(this.$cX("br"));
-			u.appendChild(this.$cX("span", {
-				className: "CanvasXpressBin",
-				innerHTML: "Sample Metadata"
-			}));
-			u.appendChild(this.$cX("img", {
-				id: this.target + "-cX-DataExplorerSortAnnotations",
-				className: "CanvasXpressDataExplorer",
-				src: CanvasXpress.images.sortAsciiAsc,
-				asr: CanvasXpress.images.sortAsciiDesc,
-				params: ["sortDataExplorer"],
-				alt: "Sort Sample Metadata",
-				title: "Sort Sample Metadata"
-			}, {
-				border: "none",
-				padding: 0
-			}));
-			u.appendChild(this.$cX("br"));
-			u.appendChild(h);
-			u.appendChild(this.$cX("br"));
-			u.appendChild(this.$cX("hr", {
-				className: "CanvasXpressDataExplorer"
-			}, {
-				width: "201px"
-			}));
-			u.appendChild(this.$cX("br"));
-			u.appendChild(this.$cX("span", {
-				className: "CanvasXpressBin",
-				innerHTML: "Samples"
-			}));
-			u.appendChild(this.$cX("img", {
-				id: this.target + "-cX-DataExplorerSortSamples",
-				className: "CanvasXpressDataExplorer",
-				src: CanvasXpress.images.sortAsciiAsc,
-				asr: CanvasXpress.images.sortAsciiDesc,
-				params: ["sortDataExplorer"],
-				alt: "Sort Samples",
-				title: "Sort Samples"
-			}, {
-				border: "none",
-				padding: 0
-			}));
-			u.appendChild(this.$cX("br"));
-			u.appendChild(k);
-			u.appendChild(this.$cX("br"));
-			u.appendChild(this.$cX("span", {
-				className: "CanvasXpressBin",
-				innerHTML: "Variable Metadata"
-			}));
-			u.appendChild(this.$cX("img", {
-				id: this.target + "-cX-DataExplorerSortDescriptions",
-				className: "CanvasXpressDataExplorer",
-				src: CanvasXpress.images.sortAsciiAsc,
-				asr: CanvasXpress.images.sortAsciiDesc,
-				params: ["sortDataExplorer"],
-				alt: "Sort Variable Metadata",
-				title: "Sort Variable Metadata"
-			}, {
-				border: "none",
-				padding: 0
-			}));
-			u.appendChild(this.$cX("br"));
-			u.appendChild(g);
-			q.appendChild(u);
-			l.appendChild(q);
+				height: "18px"
+			});
+			h.appendChild(b);
+			var l = this.loadDataExplorerBottomPanel();
+			h.appendChild(l);
+			g.appendChild(h);
+			k.appendChild(g);
 			this.addRemoveDataExplorerListeners("addEvtListener")
 		}
+	};
+	this.loadDataExplorerTopPanel = function() {
+		var g = this.loadFormatDataExplorerDiv();
+		var c = this.loadLayoutDataExplorerDiv();
+		var a = this.loadMetadataDataExplorerDiv();
+		var h = this.loadPropertiesDataExplorerDiv();
+		var f = this.loadOrientationDataExplorerDiv();
+		var b = this.loadGraphTypesDataExplorerDiv();
+		var e = this.loadAxesDataExplorerDiv();
+		var d = this.$cX("div", {
+			className: "CanvasXpressDataExplorerPanel"
+		});
+		d.appendChild(g);
+		d.appendChild(c);
+		d.appendChild(a);
+		d.appendChild(this.$cX("br"));
+		d.appendChild(h);
+		d.appendChild(f);
+		d.appendChild(this.$cX("br"));
+		d.appendChild(b);
+		d.appendChild(e);
+		d.appendChild(this.$cX("br"));
+		d.appendChild(this.$cX("hr", {
+			className: "CanvasXpressDataExplorer"
+		}, {
+			width: "201px"
+		}));
+		return d
+	};
+	this.loadDataExplorerMiddlePanel = function() {
+		var b = this.loadVariablesDataExplorerDiv();
+		var a = this.loadAnnotationsDataExplorerDiv();
+		var c = this.$cX("div", {
+			className: "CanvasXpressDataExplorerPanel"
+		});
+		c.appendChild(this.$cX("br"));
+		c.appendChild(this.$cX("span", {
+			className: "CanvasXpressBin",
+			innerHTML: "Variables / Data Series"
+		}));
+		c.appendChild(this.$cX("img", {
+			id: this.target + "-cX-DataExplorerSortVariables",
+			className: "CanvasXpressDataExplorer",
+			src: CanvasXpress.images.sortAsciiAsc,
+			asr: CanvasXpress.images.sortAsciiDesc,
+			params: ["sortDataExplorer"],
+			alt: "Sort Variables",
+			title: "Sort Variables"
+		}, {
+			border: "none",
+			padding: 0
+		}));
+		c.appendChild(this.$cX("br"));
+		c.appendChild(b);
+		c.appendChild(this.$cX("br"));
+		c.appendChild(this.$cX("span", {
+			className: "CanvasXpressBin",
+			innerHTML: "Sample Metadata"
+		}));
+		c.appendChild(this.$cX("img", {
+			id: this.target + "-cX-DataExplorerSortAnnotations",
+			className: "CanvasXpressDataExplorer",
+			src: CanvasXpress.images.sortAsciiAsc,
+			asr: CanvasXpress.images.sortAsciiDesc,
+			params: ["sortDataExplorer"],
+			alt: "Sort Sample Metadata",
+			title: "Sort Sample Metadata"
+		}, {
+			border: "none",
+			padding: 0
+		}));
+		c.appendChild(this.$cX("br"));
+		c.appendChild(a);
+		return c
+	};
+	this.loadDataExplorerBottomPanel = function() {
+		var a = this.loadSamplesDataExplorerDiv();
+		var c = this.loadDescriptionsDataExplorerDiv();
+		var b = this.$cX("div", {
+			className: "CanvasXpressDataExplorerPanel"
+		});
+		b.appendChild(this.$cX("br"));
+		b.appendChild(this.$cX("span", {
+			className: "CanvasXpressBin",
+			innerHTML: "Samples"
+		}));
+		b.appendChild(this.$cX("img", {
+			id: this.target + "-cX-DataExplorerSortSamples",
+			className: "CanvasXpressDataExplorer",
+			src: CanvasXpress.images.sortAsciiAsc,
+			asr: CanvasXpress.images.sortAsciiDesc,
+			params: ["sortDataExplorer"],
+			alt: "Sort Samples",
+			title: "Sort Samples"
+		}, {
+			border: "none",
+			padding: 0
+		}));
+		b.appendChild(this.$cX("br"));
+		b.appendChild(a);
+		b.appendChild(this.$cX("br"));
+		b.appendChild(this.$cX("span", {
+			className: "CanvasXpressBin",
+			innerHTML: "Variable Metadata"
+		}));
+		b.appendChild(this.$cX("img", {
+			id: this.target + "-cX-DataExplorerSortDescriptions",
+			className: "CanvasXpressDataExplorer",
+			src: CanvasXpress.images.sortAsciiAsc,
+			asr: CanvasXpress.images.sortAsciiDesc,
+			params: ["sortDataExplorer"],
+			alt: "Sort Variable Metadata",
+			title: "Sort Variable Metadata"
+		}, {
+			border: "none",
+			padding: 0
+		}));
+		b.appendChild(this.$cX("br"));
+		b.appendChild(c);
+		return b
 	};
 	this.loadFormatDataExplorerDiv = function() {
 		var b = this.$cX("div", {
@@ -26157,6 +26208,8 @@ CanvasXpress.prototype.initDataExplorer = function() {
 		var k = this.$(this.target + "-cX-DataExplorerSortAnnotations");
 		var h = this.$(this.target + "-cX-DataExplorerDescriptions");
 		var c = this.$(this.target + "-cX-DataExplorerSortDescriptions");
+		this.addRemoveEvtListener(q, this.$(this.target + "-cX-DataExplorerMinimizeImage1"), "click", this.collapseExpandDataExplorerPanel, false);
+		this.addRemoveEvtListener(q, this.$(this.target + "-cX-DataExplorerMinimizeImage2"), "click", this.collapseExpandDataExplorerPanel, false);
 		this.addRemoveEvtListener(q, this.$(this.target + "-cX-DataExplorer"), "mousedown", this.registerMousemove, false);
 		this.addRemoveEvtListener(q, this.$(this.target + "-cX-DataExplorerCloseImage"), "click", this.closeDataExplorer, false);
 		e = [F, w, G, E];
@@ -26212,6 +26265,28 @@ CanvasXpress.prototype.initDataExplorer = function() {
 			}
 		}
 	};
+	this.collapseExpandDataExplorerPanel = function(a) {
+		return function(f) {
+			if (!f) {
+				f = window.event
+			}
+			var b = a.getTargetEvent(f);
+			var d = b.nextElementSibling;
+			var c = b.title;
+			if (c.match("Collapse")) {
+				b.title = c.replace("Collapse", "Expand");
+				d.style.display = "none"
+			} else {
+				b.title = c.replace("Expand", "Collapse");
+				d.style.display = "block"
+			}
+			b.alt = b.title;
+			var g = b.src;
+			b.src = b.srt;
+			b.srt = g;
+			return false
+		}
+	}(this);
 	this.dragStartDataExplorer = function(a) {
 		return function(c) {
 			if (!c) {
@@ -26290,57 +26365,57 @@ CanvasXpress.prototype.initDataExplorer = function() {
 		}
 	}(this);
 	this.dropDataExplorer = function(a) {
-		return function(s) {
-			a.cancelEvent(s);
-			var q, l, c, m;
-			var t = s.dataTransfer.getData("text");
-			var g = a.$(t);
+		return function(r) {
+			a.cancelEvent(r);
+			var p, l, c, m;
+			var s = r.dataTransfer.getData("text");
+			var g = a.$(s);
 			if (g) {
-				var w = g.innerHTML;
-				var v = g.type;
+				var v = g.innerHTML;
+				var u = g.type;
 				var h = g.numeric;
-				var u = g.params[0];
-				if (s.target.tagName == "IMG") {
-					s.target.className = "CanvasXpressDataExplorer";
-					q = a.getTargetEvent(s);
-					m = q.title.split(" : ")[0];
-					l = q.params[0];
+				var t = g.params[0];
+				if (r.target.tagName == "IMG") {
+					r.target.className = "CanvasXpressDataExplorer";
+					p = a.getTargetEvent(r);
+					m = p.title.split(" : ")[0];
+					l = p.params[0];
 					switch (l) {
 						case "groupSamples":
-							if (v == "x") {
+							if (u == "x") {
 								var f = a.groupingFactors;
-								if (a.isInArray(w, f)) {
+								if (a.isInArray(v, f)) {
 									var b = [];
-									for (var p = 0; p < f.length; p++) {
-										if (f[p] != w) {
-											b.push(f[p])
+									for (var o = 0; o < f.length; o++) {
+										if (f[o] != v) {
+											b.push(f[o])
 										}
 									}
 									f = b
 								} else {
-									f.push(w)
+									f.push(v)
 								}
 								if (f.length > 0) {
 									a.groupSamples(f);
-									q.title = m + " : " + a.groupingFactors.join(", ");
-									q.alt = q.title
+									p.title = m + " : " + a.groupingFactors.join(", ");
+									p.alt = p.title
 								} else {
 									a.ungroupSamples();
-									q.title = m;
-									q.alt = q.title
+									p.title = m;
+									p.alt = p.title
 								}
 							} else {
 								alert("Ooops! Only Sample factors")
 							}
 							return false;
 						case "segregate":
-							if (v == "x") {
-								var r = a.segregateSamplesBy;
-								if (a.isInArray(w, r)) {
+							if (u == "x") {
+								var q = a.segregateSamplesBy;
+								if (a.isInArray(v, q)) {
 									var b = [];
-									for (var p = 0; p < r.length; p++) {
-										if (r[p] != w) {
-											b.push(r[p])
+									for (var o = 0; o < q.length; o++) {
+										if (q[o] != v) {
+											b.push(q[o])
 										}
 									}
 									if (b.length > 0) {
@@ -26352,20 +26427,20 @@ CanvasXpress.prototype.initDataExplorer = function() {
 									}
 								} else {
 									if (a.segregateSamplesBy.length + a.segregateVariablesBy.length < 2) {
-										r.push(w);
-										a.segregate("Samples", r)
+										q.push(v);
+										a.segregate("Samples", q)
 									} else {
 										alert("Ooops! Only 2 segregation factors")
 									}
 								}
 							} else {
-								if (v == "z") {
-									var r = a.segregateVariablesBy;
-									if (a.isInArray(w, r)) {
+								if (u == "z") {
+									var q = a.segregateVariablesBy;
+									if (a.isInArray(v, q)) {
 										var b = [];
-										for (var p = 0; p < r.length; p++) {
-											if (r[p] != w) {
-												b.push(r[p])
+										for (var o = 0; o < q.length; o++) {
+											if (q[o] != v) {
+												b.push(q[o])
 											}
 										}
 										if (b.length > 0) {
@@ -26377,8 +26452,8 @@ CanvasXpress.prototype.initDataExplorer = function() {
 										}
 									} else {
 										if (a.segregateSamplesBy.length + a.segregateVariablesBy.length < 2) {
-											r.push(w);
-											a.segregate("Variables", r)
+											q.push(v);
+											a.segregate("Variables", q)
 										} else {
 											alert("Ooops! Only 2 segregation factors")
 										}
@@ -26390,50 +26465,37 @@ CanvasXpress.prototype.initDataExplorer = function() {
 							}
 							var b = a.segregateVariablesBy;
 							b = b.concat(a.segregateSamplesBy);
-							q.title = b.length > 0 ? m + " : " + b.join(", ") : m;
-							q.alt = q.title;
+							p.title = b.length > 0 ? m + " : " + b.join(", ") : m;
+							p.alt = p.title;
 							return false;
 						case "addToAxis":
-							var n = q.params[1][0];
-							if (v == "smps") {
-								if (s.shiftKey) {
-									var o = a[n];
-									if (a.isInArray(w, o)) {
-										if (o.length > 1) {
-											a[n] = [];
-											for (var p = 0; p < o.length; p++) {
-												if (o[p] != w) {
-													a[n].push(o[p])
-												}
-											}
-										}
-									} else {
-										a[n].push(w)
-									}
+							var n = p.params[1][0];
+							if (u == "smps") {
+								if (r.shiftKey) {
+									a.changeSampleInAxis(v, n)
 								} else {
-									a[n] = [w]
+									a.changeSampleInAxis(v, n, true)
 								}
-								a.draw();
-								q.title = m + " : " + a[n].join(", ");
-								q.alt = q.title
+								p.title = m + " : " + a[n].join(", ");
+								p.alt = p.title
 							} else {
 								alert("Ooops! Only samples allowed")
 							}
 							return false;
 						case "motion":
-							if (v == "smps") {
-								c = q.type;
+							if (u == "smps") {
+								c = p.type;
 								g.type = c;
-								a[u](w);
+								a[t](v);
 								g.params[0] = "switchAnnotationToSmp";
 								var j = a.$(a.target + "-cX-DataExplorerDescriptions");
 								if (j) {
 									j.appendChild(g)
 								}
 							} else {
-								if (v == "vars") {
+								if (u == "vars") {
 									g.type = c;
-									a[u](w);
+									a[t](v);
 									g.params[0] = "switchAnnotationToVar";
 									var k = a.$(a.target + "-cX-DataExplorerAnnotations");
 									if (k) {
@@ -26441,58 +26503,56 @@ CanvasXpress.prototype.initDataExplorer = function() {
 									}
 								}
 							}
-							a.motionBy = w;
-							a.draw();
-							q.title = m + " : " + w;
-							q.alt = q.title;
+							a.changeAttribute("motionBy", v);
+							p.title = m + " : " + v;
+							p.alt = p.title;
 							return false;
 						case "linLog":
 							return false;
 						default:
-							a[l] = w;
-							a.draw();
-							q.title = m + " : " + w;
-							q.alt = q.title;
+							a.changeAttribute(l, v);
+							p.title = m + " : " + v;
+							p.alt = p.title;
 							return false
 					}
 				} else {
-					if (s.target.tagName == "SPAN" && s.target.parentNode.lastChild && s.target.parentNode.lastChild.tagName != "IMG") {
-						q = s.target.parentNode
+					if (r.target.tagName == "SPAN" && r.target.parentNode.lastChild && r.target.parentNode.lastChild.tagName != "IMG") {
+						p = r.target.parentNode
 					} else {
-						if (s.target.tagName == "DIV") {
-							q = s.target
+						if (r.target.tagName == "DIV") {
+							p = r.target
 						}
 					}
-					c = q.type;
-					if (v == c) {
+					c = p.type;
+					if (u == c) {
 						return false
 					} else {
-						if (v == "smps" && c == "z") {
+						if (u == "smps" && c == "z") {
 							g.type = c;
-							a[u](w);
+							a[t](v);
 							g.params[0] = "switchAnnotationToSmp"
 						} else {
-							if (v == "z" && c == "smps") {
+							if (u == "z" && c == "smps") {
 								if (!h) {
 									alert("Ooops! Only numeric data");
 									return false
 								}
 								g.type = c;
-								a[u](w);
+								a[t](v);
 								g.params[0] = "switchSmpToAnnotation"
 							} else {
-								if (v == "vars" && c == "x") {
+								if (u == "vars" && c == "x") {
 									g.type = c;
-									a[u](w);
+									a[t](v);
 									g.params[0] = "switchAnnotationToVar"
 								} else {
-									if (v == "x" && c == "vars") {
+									if (u == "x" && c == "vars") {
 										if (!h) {
 											alert("Ooops! Only numeric data");
 											return false
 										}
 										g.type = c;
-										a[u](w);
+										a[t](v);
 										g.params[0] = "switchVarToAnnotation"
 									} else {
 										alert("Ooops! Only changes between data and ortogonal numeric metadata");
@@ -26502,7 +26562,7 @@ CanvasXpress.prototype.initDataExplorer = function() {
 							}
 						}
 					}
-					q.appendChild(g)
+					p.appendChild(g)
 				}
 			}
 			return false
@@ -26565,11 +26625,10 @@ CanvasXpress.prototype.initDataExplorer = function() {
 			if (c && b) {
 				var d = b[1][0] + "Transform";
 				if (a[d]) {
-					a[d] = false
+					a.changeAttribute(d, false)
 				} else {
-					a[d] = a.transformBase == 2 ? "log2" : "log10"
+					a.changeAttribute(d, a.transformBase == 2 ? "log2" : "log10")
 				}
-				a.draw()
 			}
 			return false
 		}
@@ -26601,19 +26660,16 @@ CanvasXpress.prototype.initDataExplorer = function() {
 				case "addToAxis":
 					var h = c.params[1][0];
 					var d = a[h];
-					a[h] = [d[0]];
-					a.draw();
+					a.changeSampleInAxis(d[0], h, true);
 					c.title = f + " : " + a[h].join(", ");
 					c.alt = c.title;
 					return false;
 				case "motion":
-					a.motionBy = false;
-					a.draw();
+					a.changeAttribute("motionBy", false);
 					return false;
 				default:
 					if (a[b[0]]) {
-						a[b[0]] = false;
-						a.draw()
+						a.changeAttribute(b[0], false)
 					}
 					return false
 			}
@@ -27582,7 +27638,8 @@ CanvasXpress.prototype.initDataFilter = function() {
 		var u = this.$cX("div", {
 			id: this.target + ":" + B + ":cX-DataFilterScale",
 			className: f[0] <= 0 ? "CanvasXpressDataFilterContainerScaleNone" : "CanvasXpressDataFilterContainerScaleLinearLog",
-			innerHTML: w
+			innerHTML: w,
+			draggable: true
 		}, {
 			width: (this.dataFilterWidth - 12) + "px",
 			margin: "5px"
@@ -27659,9 +27716,44 @@ CanvasXpress.prototype.initDataFilter = function() {
 			this[e](a, "mousedown", this.mousedownNumericFilter, false);
 			this[e](f, "change", this.changeNumericFilter, false);
 			this[e](c, "change", this.changeNumericFilter, false);
-			this[e](b, "click", this.clickNumericFilter, false)
+			this[e](b, "click", this.clickNumericFilter, false);
+			this[e](b, "dragstart", this.dragStartDataFilter, false);
+			this[e](b, "dragend", this.dragEndDataFilter, false)
 		}
 	};
+	this.dragStartDataFilter = function(a) {
+		return function(c) {
+			if (!c) {
+				c = window.event
+			}
+			c.acs = a.adjustedCoordinates(c);
+			var b = a.getTargetEvent(c);
+			if (b) {
+				c.dataTransfer.setDragImage(b.parentNode, -5, -5);
+				b.parentNode.style.opacity = "0.3";
+				c.dataTransfer.setData("text/html", b.parentNode.innerHTML);
+				a.xMouseDown = c.screenX;
+				a.yMouseDown = c.screenY
+			}
+			return false
+		}
+	}(this);
+	this.dragEndDataFilter = function(a) {
+		return function(g) {
+			if (!g) {
+				g = window.event
+			}
+			g.ace = a.adjustedCoordinates(g);
+			var c = a.getTargetEvent(g);
+			var f = c.parentNode.innerHTML;
+			if (c) {
+				c.parentNode.style.opacity = "1.0";
+				var d = g.screenX - a.xMouseDown;
+				var b = g.screenY - a.yMouseDown
+			}
+			return false
+		}
+	}(this);
 	this.changeNumericFilter = function(a) {
 		return function(c) {
 			if (!c) {
@@ -27894,7 +27986,8 @@ CanvasXpress.prototype.initDataFilter = function() {
 			type: "string"
 		});
 		var f = this.$cX("div", {
-			innerHTML: g
+			innerHTML: g,
+			draggable: true
 		}, {
 			width: "98%",
 			margin: "5px"
@@ -27997,13 +28090,16 @@ CanvasXpress.prototype.initDataFilter = function() {
 			}
 		}
 	};
-	this.addRemoveStringDataFilterListeners = function(b, a) {
-		if (b && a) {
-			if (a.firstChild.type == "long") {
-				this[b](a, "scroll", this.scrollStringFilter, false)
+	this.addRemoveStringDataFilterListeners = function(c, b) {
+		if (c && b) {
+			var a = b.parentNode.firstElementChild;
+			if (b.firstChild.type == "long") {
+				this[c](b, "scroll", this.scrollStringFilter, false)
 			}
-			this[b](a, "mousedown", this.registerStringFilter, false);
-			this[b](a, "mouseup", this.endStringFilter, false)
+			this[c](b, "mousedown", this.registerStringFilter, false);
+			this[c](b, "mouseup", this.endStringFilter, false);
+			this[c](a, "dragstart", this.dragStartDataFilter, false);
+			this[c](a, "dragend", this.dragEndDataFilter, false)
 		}
 	};
 	this.scrollStringFilter = function(a) {
@@ -43509,7 +43605,7 @@ CanvasXpress.prototype.initData = function(b, a) {
 									}
 								}
 							} else {
-								if (f == "iqr" && !g) {
+								if (f == "iqr" && !g && this.grpIndices) {
 									for (var F = 0; F < this.varIndices.length; F++) {
 										var u = this.varIndices[F];
 										for (var C = 0; C < this.grpIndices.length; C++) {
@@ -43598,62 +43694,64 @@ CanvasXpress.prototype.initData = function(b, a) {
 												}
 											} else {
 												var L = this.isTransformedData ? d.trans : d.data;
-												if (H) {
-													E = 0;
-													A = 0;
-													for (var F = 0; F < this.smpIndices.length; F++) {
-														var q = 0;
-														var s = 0;
-														for (var C = 0; C < this.varIndices.length; C++) {
-															var N = L[this.varIndices[C]][this.smpIndices[F]];
-															if (!isNaN(N)) {
-																if (N > 0) {
-																	q += N
-																} else {
-																	if (N < 0) {
-																		s += N
-																	}
-																}
-															}
-														}
-														E = Math.max(q, E);
-														A = Math.min(s, A)
-													}
-												} else {
-													if (this.treemapBy && this.data.z.hasOwnProperty(this.treemapBy)) {
-														var x = this.getVariableLevelsByAnnotation(this.treemapBy);
+												if (L.length > 0) {
+													if (H) {
+														E = 0;
+														A = 0;
 														for (var F = 0; F < this.smpIndices.length; F++) {
-															var r = 0;
-															for (var C = 0; C < x.length; C++) {
-																var z = this.getVariablesByAnnotationLevel(this.treemapBy, x[C]);
-																for (var B = 0; B < z.length; B++) {
-																	var N = L[this.varIndices[B]][this.smpIndices[F]];
-																	if (!isNaN(N) && N > 0) {
-																		r += N
+															var q = 0;
+															var s = 0;
+															for (var C = 0; C < this.varIndices.length; C++) {
+																var N = L[this.varIndices[C]][this.smpIndices[F]];
+																if (!isNaN(N)) {
+																	if (N > 0) {
+																		q += N
 																	} else {
 																		if (N < 0) {
-																			this.treemapBy = false;
-																			return this.setRangeData(f, g, c, H, O)
+																			s += N
 																		}
 																	}
 																}
 															}
-															E = Math.max(r, E)
+															E = Math.max(q, E);
+															A = Math.min(s, A)
 														}
-														A = 0
 													} else {
-														for (var F = 0; F < this.varIndices.length; F++) {
-															for (var C = 0; C < this.smpIndices.length; C++) {
-																var N = L[this.varIndices[F]][this.smpIndices[C]];
-																if (!isNaN(N)) {
-																	if (c) {
-																		if (N > 0) {
+														if (this.treemapBy && this.data.z.hasOwnProperty(this.treemapBy)) {
+															var x = this.getVariableLevelsByAnnotation(this.treemapBy);
+															for (var F = 0; F < this.smpIndices.length; F++) {
+																var r = 0;
+																for (var C = 0; C < x.length; C++) {
+																	var z = this.getVariablesByAnnotationLevel(this.treemapBy, x[C]);
+																	for (var B = 0; B < z.length; B++) {
+																		var N = L[this.varIndices[B]][this.smpIndices[F]];
+																		if (!isNaN(N) && N > 0) {
+																			r += N
+																		} else {
+																			if (N < 0) {
+																				this.treemapBy = false;
+																				return this.setRangeData(f, g, c, H, O)
+																			}
+																		}
+																	}
+																}
+																E = Math.max(r, E)
+															}
+															A = 0
+														} else {
+															for (var F = 0; F < this.varIndices.length; F++) {
+																for (var C = 0; C < this.smpIndices.length; C++) {
+																	var N = L[this.varIndices[F]][this.smpIndices[C]];
+																	if (!isNaN(N)) {
+																		if (c) {
+																			if (N > 0) {
+																				A = Math.min(N, A);
+																				E = Math.max(N, E)
+																			}
+																		} else {
 																			A = Math.min(N, A);
 																			E = Math.max(N, E)
 																		}
-																	} else {
-																		A = Math.min(N, A);
-																		E = Math.max(N, E)
 																	}
 																}
 															}
@@ -44286,19 +44384,35 @@ CanvasXpress.prototype.initData = function(b, a) {
 				}
 				if (s == "iqr") {
 					this.summaryType = "iqr";
-					for (var l = 0; l < o.length; l++) {
-						var w = this.quantiles(o[l], f);
-						if (this.isTransformedData) {
-							c.trans[z][l] = w[1]
+					if (!this.isGroupedData) {
+						for (var l = 0; l < o.length; l++) {
+							if (this.isTransformedData) {
+								c.trans[z][l] = o[l][0]
+							}
+							c.mean[z][l] = o[l][0];
+							c.median[z][l] = o[l][0];
+							c.qtl1[z][l] = o[l][0];
+							c.qtl3[z][l] = o[l][0];
+							c.iqr1[z][l] = o[l][0];
+							c.iqr3[z][l] = o[l][0];
+							c.out[z][l] = [];
+							c.n[z][l] = 1
 						}
-						c.mean[z][l] = w[0];
-						c.median[z][l] = w[2];
-						c.qtl1[z][l] = w[1];
-						c.qtl3[z][l] = w[3];
-						c.iqr1[z][l] = w[4];
-						c.iqr3[z][l] = w[5];
-						c.out[z][l] = w[6];
-						c.n[z][l] = w[7]
+					} else {
+						for (var l = 0; l < o.length; l++) {
+							var w = this.quantiles(o[l], f);
+							if (this.isTransformedData) {
+								c.trans[z][l] = w[1]
+							}
+							c.mean[z][l] = w[0];
+							c.median[z][l] = w[2];
+							c.qtl1[z][l] = w[1];
+							c.qtl3[z][l] = w[3];
+							c.iqr1[z][l] = w[4];
+							c.iqr3[z][l] = w[5];
+							c.out[z][l] = w[6];
+							c.n[z][l] = w[7]
+						}
 					}
 				} else {
 					if (s == "median") {
@@ -46685,128 +46799,140 @@ CanvasXpress.prototype.initData = function(b, a) {
 			}
 		}
 	};
-	this.changeSampleInAxis = function(f, g) {
+	this.changeSampleInAxis = function(g, k, d) {
 		this.functionCaller = "changeSampleInAxis";
 		if (this.graphType.match(/Scatter/)) {
-			var d, c, k, e;
-			d = this.getObjectArray(this.xAxis);
+			var e, c, l, f;
+			e = this.getObjectArray(this.xAxis);
 			c = this.getObjectArray(this.yAxis);
 			if (this.graphType == "ScatterBubble2D" || this.graphType == "Scatter3D") {
-				k = this.getObjectArray(this.zAxis);
-				e = true
+				l = this.getObjectArray(this.zAxis);
+				f = true
 			}
-			if (g == "xAxis") {
-				if (c[f] && !e) {
-					if (this.yAxis.length > 1) {
-						this.removeSamplesFromAxis([f], "yAxis")
-					} else {
-						alert("Cannot remove " + f + " from Y-Axis");
-						this.removeMenus();
-						return
-					}
-					this.addSamplesToAxis([f], g)
+			if (k == "xAxis") {
+				if (d) {
+					this.switchSampleInAxis([g], k)
 				} else {
-					if (k && k[f] && !e) {
-						if (this.zAxis.length > 1) {
-							this.removeSamplesFromAxis([f], "zAxis")
+					if (c[g] && !f) {
+						if (this.yAxis.length > 1) {
+							this.removeSamplesFromAxis([g], "yAxis")
 						} else {
-							alert("Cannot remove " + f + " from Z-Axis");
+							alert("Cannot remove " + g + " from Y-Axis");
 							this.removeMenus();
 							return
 						}
+						this.addSamplesToAxis([g], k)
 					} else {
-						if (d[f] && !e) {
-							if (this.xAxis.length > 1) {
-								this.removeSamplesFromAxis([f], g)
+						if (l && l[g] && !f) {
+							if (this.zAxis.length > 1) {
+								this.removeSamplesFromAxis([g], "zAxis")
 							} else {
-								alert("Cannot remove " + f + " from X-Axis");
+								alert("Cannot remove " + g + " from Z-Axis");
 								this.removeMenus();
 								return
 							}
 						} else {
-							if (e) {
-								this[g] = [];
-								this.addSamplesToAxis([f], g)
+							if (e[g] && !f) {
+								if (this.xAxis.length > 1) {
+									this.removeSamplesFromAxis([g], k)
+								} else {
+									alert("Cannot remove " + g + " from X-Axis");
+									this.removeMenus();
+									return
+								}
 							} else {
-								this.addSamplesToAxis([f], g)
+								if (f) {
+									this[k] = [];
+									this.addSamplesToAxis([g], k)
+								} else {
+									this.addSamplesToAxis([g], k)
+								}
 							}
 						}
 					}
 				}
 			} else {
-				if (g == "yAxis") {
-					if (d[f] && !e) {
-						if (this.xAxis.length > 1) {
-							this.removeSamplesFromAxis([f], "xAxis")
-						} else {
-							alert("Cannot remove " + f + " from X-Axis");
-							this.removeMenus();
-							return
-						}
-						this.addSamplesToAxis([f], g)
+				if (k == "yAxis") {
+					if (d) {
+						this.switchSampleInAxis([g], k)
 					} else {
-						if (k && k[f] && !e) {
-							if (this.zAxis.length > 1) {
-								this.removeSamplesFromAxis([f], "zAxis")
+						if (e[g] && !f) {
+							if (this.xAxis.length > 1) {
+								this.removeSamplesFromAxis([g], "xAxis")
 							} else {
-								alert("Cannot remove " + f + " from Z-Axis");
+								alert("Cannot remove " + g + " from X-Axis");
 								this.removeMenus();
 								return
 							}
+							this.addSamplesToAxis([g], k)
 						} else {
-							if (c[f] && !e) {
-								if (this.yAxis.length > 1) {
-									this.removeSamplesFromAxis([f], g)
+							if (l && l[g] && !f) {
+								if (this.zAxis.length > 1) {
+									this.removeSamplesFromAxis([g], "zAxis")
 								} else {
-									alert("Cannot remove " + f + " from Y-Axis");
+									alert("Cannot remove " + g + " from Z-Axis");
 									this.removeMenus();
 									return
 								}
 							} else {
-								if (e) {
-									this[g] = [];
-									this.addSamplesToAxis([f], g)
+								if (c[g] && !f) {
+									if (this.yAxis.length > 1) {
+										this.removeSamplesFromAxis([g], k)
+									} else {
+										alert("Cannot remove " + g + " from Y-Axis");
+										this.removeMenus();
+										return
+									}
 								} else {
-									this.addSamplesToAxis([f], g)
+									if (f) {
+										this[k] = [];
+										this.addSamplesToAxis([g], k)
+									} else {
+										this.addSamplesToAxis([g], k)
+									}
 								}
 							}
 						}
 					}
 				} else {
-					if (g == "zAxis") {
-						if (d[f] && !e) {
-							if (this.xAxis.length > 1) {
-								this.removeSamplesFromAxis([f], "xAxis")
-							} else {
-								alert("Cannot remove " + f + " from X-Axis");
-								this.removeMenus();
-								return
-							}
-							this.addSamplesToAxis([f], g)
+					if (k == "zAxis") {
+						if (d) {
+							this.switchSampleInAxis([g], k)
 						} else {
-							if (c[f] && !e) {
-								if (this.yAxis.length > 1) {
-									this.removeSamplesFromAxis([f], "yAxis")
+							if (e[g] && !f) {
+								if (this.xAxis.length > 1) {
+									this.removeSamplesFromAxis([g], "xAxis")
 								} else {
-									alert("Cannot remove " + f + " from Y-Axis");
+									alert("Cannot remove " + g + " from X-Axis");
 									this.removeMenus();
 									return
 								}
+								this.addSamplesToAxis([g], k)
 							} else {
-								if (k[f] && !e) {
-									if (this.zAxis.length > 1) {
-										this.removeSamplesFromAxis([f], g)
+								if (c[g] && !f) {
+									if (this.yAxis.length > 1) {
+										this.removeSamplesFromAxis([g], "yAxis")
 									} else {
-										alert("Cannot remove " + f + " from Z-Axis");
+										alert("Cannot remove " + g + " from Y-Axis");
 										this.removeMenus();
 										return
 									}
 								} else {
-									if (e) {
-										this[g] = [];
-										this.addSamplesToAxis([f], g)
+									if (l[g] && !f) {
+										if (this.zAxis.length > 1) {
+											this.removeSamplesFromAxis([g], k)
+										} else {
+											alert("Cannot remove " + g + " from Z-Axis");
+											this.removeMenus();
+											return
+										}
 									} else {
-										this.addSamplesToAxis([f], g)
+										if (f) {
+											this[k] = [];
+											this.addSamplesToAxis([g], k)
+										} else {
+											this.addSamplesToAxis([g], k)
+										}
 									}
 								}
 							}
@@ -47450,10 +47576,11 @@ CanvasXpress.prototype.initData = function(b, a) {
 		var f = c.vals.length - 1;
 		return parseFloat((((e - c.min) / (c.max - c.min)) * (this[h[d]][f] - this[h[d]][0]))) + parseInt(this[h[d]][0])
 	};
-	this.getPropertyValue = function(o, r, x) {
-		var k, f, y;
-		var e = this[x];
-		var w = this.isGroupedData && (this.graphType == "Dotplot" || (this.graphType == "Boxplot" && this.showBoxplotOriginalData));
+	this.getPropertyValue = function(o, r, y) {
+		var w = this;
+		var k, f, A;
+		var e = this[y];
+		var x = this.isGroupedData && (this.graphType == "Dotplot" || (this.graphType == "Boxplot" && this.showBoxplotOriginalData));
 		var u = this.groupingFactors && this.groupingFactors.length == 1;
 		var s = {
 			colorBy: "colors",
@@ -47466,66 +47593,81 @@ CanvasXpress.prototype.initData = function(b, a) {
 			patternBy: "patterns",
 			patternByData: "patterns"
 		};
-		var d = x ? this[s[x]].length : false;
+		var z = function() {
+			var g = {};
+			var p = 0;
+			for (var m = 0; m < w.data.w.grps[r].length; m++) {
+				var c = w.data.x[e][w.data.w.grps[r][m]];
+				if (!g.hasOwnProperty(c)) {
+					g[c] = true;
+					p++
+				}
+				if (p > 1) {
+					return false
+				}
+			}
+			return true
+		};
+		var d = y ? this[s[y]].length : false;
 		if (e && this.data.y.hasOwnProperty(e)) {
 			k = this.data.y[e][o][r];
 			f = this.meta.data[e];
-			y = f.type
+			A = f.type
 		} else {
 			if (e && this.data.x && this.data.x.hasOwnProperty(e)) {
 				f = this.meta.data.x[e];
-				if (w || !this.isGroupedData) {
+				if (x || !this.isGroupedData) {
 					k = this.data.x[e][r];
-					y = f.type
+					A = f.type
 				} else {
-					if (u && this.groupingFactors[0] == e) {
+					if (u && (this.groupingFactors[0] == e || z())) {
 						k = this.data.x[e][this.data.w.grps[r][0]];
-						return x.match(/colorBy|patternBy/) ? this[s[x]][f.order[k] % d] : this[s[x]][0]
+						return y.match(/colorBy|patternBy/) ? this[s[y]][f.order[k] % d] : this[s[y]][0]
 					} else {
-						return x.match(/colorBy|patternBy/) ? this[s[x]][o % d] : this[s[x]][0]
+						return y.match(/colorBy|patternBy/) ? this[s[y]][o % d] : this[s[y]][0]
 					}
 				}
 			} else {
 				if (e && this.data.z && this.data.z.hasOwnProperty(e)) {
 					k = this.data.z[e][o];
 					f = this.meta.data.z[e];
-					y = f.type
+					A = f.type
 				} else {
-					if (x && ((this.isGroupedData && this.meta.data.w.smps.hasOwnProperty(x)) || (!this.isGroupedData && this.meta.data.y.range.hasOwnProperty(x)))) {
+					if (y && ((this.isGroupedData && this.meta.data.w.smps.hasOwnProperty(y)) || (!this.isGroupedData && this.meta.data.y.range.hasOwnProperty(y)))) {
 						k = this.data.y.data[o][r];
-						f = this.meta.data.y.range[x];
-						y = f.type
+						f = this.meta.data.y.range[y];
+						A = f.type
 					} else {
 						if (o != null) {
-							return e && x.match(/colorBy|patternBy/) ? this[s[x]][o % d] : !e && x == "colorBy" ? this[s[x]][o % d] : this[s[x]][0]
+							return e && y.match(/colorBy|patternBy/) ? this[s[y]][o % d] : !e && y == "colorBy" ? this[s[y]][o % d] : this[s[y]][0]
 						} else {
-							return x.match(/sizeBy/) ? 10 : this[s[x]][0]
+							return y.match(/sizeBy/) ? 10 : this[s[y]][0]
 						}
 					}
 				}
 			}
 		}
-		if (y == "Numeric") {
-			if (x.match(/colorBy|outlineBy/)) {
+		if (A == "Numeric") {
+			if (y.match(/colorBy|outlineBy/)) {
 				return !isNaN(k) ? this.getColorForValue(f.colorBrew, k) : this.missingDataColor
 			} else {
-				if (x.match(/shapeBy/)) {
+				if (y.match(/shapeBy/)) {
 					if (!isNaN(k)) {
-						return "pie" + this.getPropertyValueBin(f, k, true, s, x)
+						return "pie" + this.getPropertyValueBin(f, k, true, s, y)
 					} else {
 						return "sphere"
 					}
 				} else {
-					if (x.match(/sizeBy/)) {
+					if (y.match(/sizeBy/)) {
 						if (!isNaN(k)) {
-							return this.sizeByContinuous ? this.getPropertyValueSize(f, k) : this.getPropertyValueBin(f, k, false, s, x)
+							return this.sizeByContinuous ? this.getPropertyValueSize(f, k) : this.getPropertyValueBin(f, k, false, s, y)
 						} else {
-							return this[s[x]][0]
+							return this[s[y]][0]
 						}
 					} else {
-						if (x.match(/patternBy/)) {
+						if (y.match(/patternBy/)) {
 							if (!isNaN(k)) {
-								return this.getPropertyValueBin(f, k, false, s, x)
+								return this.getPropertyValueBin(f, k, false, s, y)
 							} else {
 								return "closed"
 							}
@@ -47534,8 +47676,8 @@ CanvasXpress.prototype.initData = function(b, a) {
 				}
 			}
 		} else {
-			if (y == "String") {
-				return x.match(/sizeBy/) ? parseInt(this[s[x]][f.order[k] % d]) : this[s[x]][f.order[k] % d]
+			if (A == "String") {
+				return y.match(/sizeBy/) ? parseInt(this[s[y]][f.order[k] % d]) : this[s[y]][f.order[k] % d]
 			}
 		}
 	};
@@ -49160,7 +49302,14 @@ CanvasXpress.prototype.initRemote = function() {
 		params.params = JSON.stringify(config);
 		params.cxdata = JSON.stringify(this.cloneObject(this.data));
 		this.ajaxRequest(this.remoteService, params, function() {
-			alert("CanvasXpress data " + type + "d in the server")
+			alert("CanvasXpress data saved " + type + " in the server")
+		}, "json", "POST")
+	};
+	this.clearRemote = function() {
+		var that = this;
+		params.clear = true;
+		this.ajaxRequest(this.remoteService, params, function() {
+			alert("CanvasXpress data parameters clear from the server")
 		}, "json", "POST")
 	};
 	this.castRemoteParameters = function(o) {
@@ -49184,7 +49333,7 @@ CanvasXpress.prototype.initRemote = function() {
 		return [parseInt(o.width) + 18, parseInt(o.height) + 18 + t]
 	};
 	this.updateRemoteData = function(t) {
-		return function(res) {
+		return function(res, callback) {
 			if (res && res.data) {
 				var d;
 				if (t.remoteServiceType == "file") {
@@ -49253,6 +49402,9 @@ CanvasXpress.prototype.initRemote = function() {
 					}
 					if (t.showCode) {
 						n.updateCodeDiv()
+					}
+					if (callback) {
+						callback()
 					}
 				}
 			} else {
@@ -50260,14 +50412,17 @@ CanvasXpress.prototype.initAxes = function(a) {
 			}
 		}
 	};
-	this.addSamplesToAxis = function(d, c) {
-		if (this[c]) {
-			if (this.isArray(d)) {
-				for (var b = 0; b < d.length; b++) {
-					this[c].push(d[b])
+	this.addSamplesToAxis = function(e, d) {
+		if (this[d]) {
+			if (this.isArray(e)) {
+				var c = this.getObjectArray(this[d]);
+				for (var b = 0; b < e.length; b++) {
+					if (!c.hasOwnProperty(e[b])) {
+						this[d].push(e[b])
+					}
 				}
 			} else {
-				this[c].push(d)
+				this[d].push(e)
 			}
 			return false
 		} else {
@@ -50302,7 +50457,7 @@ CanvasXpress.prototype.initAxes = function(a) {
 	};
 	this.switchSampleInAxis = function(c, b) {
 		if (this[b]) {
-			this[b][0] = c;
+			this[b][0] = this.isArray(c) ? c[0] : c;
 			return false
 		} else {
 			return "Not a valid axis"
@@ -53209,7 +53364,17 @@ CanvasXpress.prototype.oneDPlot = function(a) {
 			this.setPropertyFontSize(b, "varTitleFont");
 			this.setPropertyFontSize(b, "varLabelFont");
 			this.setPropertyFontSize(this.graphOrientation == "vertical" ? b : g, "smpTitleFont");
-			this.setPropertyFontSize(this.graphOrientation == "vertical" ? b : g, "smpLabelFont")
+			this.setPropertyFontSize(this.graphOrientation == "vertical" ? b : g, "smpLabelFont");
+			if (this.graphType == "Heatmap" && this.heatmapLabelSizeAutoAdjust) {
+				if (this.varLabelFontSize > this.colBlockSize) {
+					this.varLabelFontSize = Math.min(Math.max(parseInt((this.colBlockSize - 1) * this.varLabelScaleFontFactor) + 1, this.minTextSize), this.maxTextSize);
+					this.varLabelFont = this.varLabelFontStyle + " " + this.varLabelFontSize + "px " + this.fontName
+				}
+				if (this.smpLabelFontSize > this.rowBlockSize) {
+					this.smpLabelFontSize = Math.min(Math.max(parseInt((this.rowBlockSize - 1) * this.smpLabelScaleFontFactor) + 1, this.minTextSize), this.maxTextSize);
+					this.smpLabelFont = this.smpLabelFontStyle + " " + this.smpLabelFontSize + "px " + this.fontName
+				}
+			}
 		}
 	};
 	this.setOverlays = function(u) {
@@ -56248,7 +56413,7 @@ CanvasXpress.prototype.oneDPlot = function(a) {
 				H.push([e[E], x[C]])
 			}
 			if (this.showViolinBoxplot) {
-				this.drawBoxPlot(F, A, f, this.rowBlockSize / 3, y, this.xAxisUnit, this.xAxisMin, this.graphOrientation, G, u, H)
+				this.drawBoxPlot(F, A, f, this.rowBlockSize / 3, y, this.xAxisUnit, this.xAxisMin, this.graphOrientation, G, u, H, w)
 			} else {
 				this.drawBoxPlot(F, A, f, this.rowBlockSize, y, this.xAxisUnit, this.xAxisMin, this.graphOrientation, G, u, H)
 			}
@@ -62565,6 +62730,7 @@ CanvasXpress.images = {
 	clusterSamples: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAY0lEQVR42qWTSwoAMQhDm5t7835gBBliidZVCyZ5KGI8FpQmM5vhjf2Z+LRQRC4sERwDF8kEampKkKX+Ta8ESiol8ERmUJrBaWD40haiQRS0tqDOgja1CZigNIOsWreg1rPBAuwxXhH250nfAAAAAElFTkSuQmCC",
 	clusterVariables: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAWklEQVR42mNkoBAw0tyAhoaG/0DMSJIBIE14DGQkygBstmITZ0RXgM9GogzApQHdcJg4SQZgY1PPAGQngiSx8bGJY9hGKk09A8gFcAOAHvsP5DCSStM+MxECALpLmhHlv+W/AAAAAElFTkSuQmCC",
 	cog: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAGSSURBVCjPVVFNSwJhEF78Ad79Cf6PvXQRsotUlzKICosuRYmR2RJR0KE6lBFFZVEbpFBSqKu2rum6llFS9HHI4iUhT153n6ZtIWMOM+/MM88z7wwH7s9Ub16SJcnbmrNcxVm2q7Z8/QPvEOtntpj92NkCqITLepEpjix7xQtiLOoQ2b6+E7YAN/5nfOEJ2WbKqOIOJ4bYVMEQx4LfBBQDsvFMhUcCVU1/CxVXmDBGA5ZETrhDCQVcYAPbyEJBhvrnBVPiSpNr6cYDNCQwo4zzU/ySckkgDYuNuVpI42T9k4gLKGMPs/xPzzovQiY2hQYe0jlJfyNNhTqiWDYBq/wBMcSRpnyPzu1oS7WtxjVBSthU1vgVksiQ3Dn6Gp5ah2YOKQo5GiuHPA6xT1EKpxQNCNYejgIR457KKio0S56YckjSa9jo//3mrj+BV0QQagqGTOo+Y7gZIf1puP3WHoLhEb2PjTlCTCWGXtbp8DCX3hZuOdaIc9A+aQvWk4ihq95p67a7nP+u+Ws+r0dql9z/zv0NCYhdCPKZ7oYAAAAASUVORK5CYII=",
+	collapseFolder: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMklEQVR42mNkQID/DKQDRkYkzYxkGPB/1AAaGUBMdDLiM2DgvTBSDYAZQipgJMdWFAAAgAUdBKIiH2cAAAAASUVORK5CYII=",
 	color: "data:image/png;base64,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",
 	colorShapeSize: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAcUlEQVR42tVSSRLAIAirLye83GI3laXtDJeWgw5CMpJQlmSUdgCoXlHei8qrrl0EBExglnwk2Hqo9zDv9R8RPGrwRsTQhUx8lKBpEs1/6jWJaMEkN7su4LASo40a3HM2uxASaPAdiRkh2gP1O1eTtAsrkPt0EQ6Mk/cAAAAASUVORK5CYII=",
 	colors: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAT0lEQVR42mNkoBAwgoiGhob/2CSB4gTl4QrqGxpQJBuBfGQDGhrq0TQ3DjsDKApEiqORYgOokg4a6lEDsaERNRDr0eQbofLDyQCKApESAADMNJARz8XIQgAAAABJRU5ErkJggg==",
@@ -62604,6 +62770,7 @@ CanvasXpress.images = {
 	decorationLine: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAY0lEQVR42q1SMQ4AIQiz9zKezr8cNA4mDpYrahdMSloKohzA3ZuZYbzBCBWp5p0Bss6zd1YpQmSAyEXhwgiKkHwFxr2JoGyd8ahfaX8iEeiYo673TglkYtDTqb/zfomsUZ2gA3Lfag2wICqCAAAAAElFTkSuQmCC",
 	decorationLines: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAd0lEQVR42mNkQAK/mRj+s/5jYGTAA0Bqju47wODg4ABWx0iOAchqSDLgwIED/62dHBgwDABJgJxEigtgeohyAUwx0V5A1kBUGODyAjaDyPICPkuo4wV8LkA3jKJ0QFIsgPggm6niApLSASyj4ApI2gUiekYh1gUA5m2oEQdDgmkAAAAASUVORK5CYII=",
 	"delete": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAACB0RVh0U29mdHdhcmUATWFjcm9tZWRpYSBGaXJld29ya3MgTVi7kSokAAAAFnRFWHRDcmVhdGlvbiBUaW1lADExLzA1LzA33bqJ2wAAAp9JREFUeJxVk8tr1FcUxz/3/n55VFMT8gCtQ6uLUBqqCCbiSgqFgpa2mVIEQUo2QnFZioj0QQVduOhf0FXBnTQDpVJ3RkTETqXkYTudjRknhj6m6TiTYfL73XNOF7+ZMHM253Lvh/M9j3ucmdFry2feOOoGB7/GR7Pmo5yqoMlOVZOdoiU7X83dfbbcy7veAKv5Y4v4aL69WSGtbyEi2YOPiPaO4EbHIYTCybuVfF+Ayo3Phhs/L5XTrX9y29WniMHUhwtMX/4GQylf/5Q/C98RAX5sAoaGq63J3PQ73z9sOzNjNX9sMTTq883qU4JBMHjrUY2fzhyhFuDs7cfcOrGfAzHEDtzLY7g4Lpx6+HferX40O2eqj+prj0kNpvILzFz/FtTAFFMFU1Bl5YtP+OuHmww4kNEJnNkJrzvta+3NCtJRPnzxcxDFVDAR6HhT5bULl9hMM863mlhIr8Vu+KWZtL6FAAK8WPqRRhRlHeo2uOM1BJqacT4kpPHQjFe1gyKCkWUdHXqdqfwCmDH5wcdMvncegIl3z5G+cpghl3GYEVQPetVsVN1h1n/7tVO3ZWWo7J5rv6/gHLu8qeA1hA18ROee1sY6dOcvWQDDQJXGxjqDXRCHimx4bTWfRHtHcIB30Cgt96miCgYmQq20RuwyLjhHrPLEWzRwxY2OEwER0Cqt9KmaSJawCrXyGkMu49rmENUrfu5OqUgIBT82QeyA7Rf8W7zPyJtzu2McPPAqz395QNJssMdD4jxOtfB+WYvOzLh3/u1hXymVpbWds8Z/BIPNAA3p2zP2RTA+4EnUqs8Tm764bu2+Zbp3cmoxVZvPPkmS9aHTsOAcbXNd5f5l6rWl46NHgnE1qM2majlTAZGqUylGpl+e/kNXevn/AT0JpV86x3yxAAAAAElFTkSuQmCC",
+	deleteSaved: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACi0lEQVR42p2TbUhTURjH/8fFRtlkotvSqc1tbmuVer2VRokiKb0QGVjQCMtIVxYSvTGIKCgqM2KIZJpEGWlaBvlCoqRZX8QaDA2TfCvzgySI3stkbrp1d8x98sPowOH8n3PO8zvP+R8OOWj98BDAaaEjzSRfgyBa7+D04j9ZQw5c6eQ0yXqpPyo3xwWTj5K6CTqOOX7wZN/Fdk7HbvovwIj9O09ySto4LWuigEf5aoxOL2Dkz8KqiTqFBFq5BMW1P2k8ah/kSVbxO07DbqGAJ6c0QVVQ+HRs+Qr2bzzJKGziNrJbKeC5JSGoCk5UDdP4l32AJ7tONnCxbCIF1J83BlXBsYohOv629/Mk1fySU7FJFHBmTzSyE8MDG4ft/YhoqINXq0Okhb40Zh39WNf0BpcdTvSFsTxhjzzjNqQkS1c76W31YYgVCiA0FLxaA2feUSjK7iHEUgS0tODQkNhFknJrODnDrApoK02H2GQCNIK58/PwTUyAWK0Aw8DX2oqC6i432bz/MRfBpAQAZeZoaJViqiev34axvhYSvR6IjwdiYgQndfAtLmLAVglzdJ6TGLIruHCGDQBar2qRdbaD6q7KHIwdLwD7pRchCQmAWg0olZhpbobNbEVjn4cnukwbF8ZsCwA6rumRYWmnuqdqL9yqOER53DSRAoRKlubm8GrSiZvhuTxR735AP5OU2UEh3TeMSC9cBrzovgB2doZqn0gEl0yGtQYDhXjGx5ExJXcR/2JsWimFrGdSpZ9vmQImTipVSFrywCfozqgojKTthLnnI2SCD17B1MwZhZusbFZtv0Mh5/JZycrcVGejKPNTc8i4LBILl2we/9z7u/d9llmH+KtI6n1tLCr/C8Ut4ia21HG2AAAAAElFTkSuQmCC",
 	disk: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAU9JREFUeNpi9K3Y28fAwJACxAwWWqIsDESAE9de/4Ey57D8+/svRclAjRfEq4qSI0Y/Q96yR2D63oVbKUz//v5lIBeA9LL8/fOX4c+ff3DBu69/Mtx59ROrBhUxdgZlUXa4epBelj9//jD8RjIApACE8QGYepBelr+//zD8+v2XJBfA1IP0svxBM4AYF8DUg/Qy/fkFNODXXzDefek9wYADqYGpB+kFuuA3w89fkGiduO0RGBMLQHrBXvj5i7yo/AMOA6gXYKA7SopBWZwNq4a7L38xxGWtYBC3sYMY8AtbIAI1O2XuArP3TXdDMQBmMHIgYkQjOHr+/SMqFv6CY+HPnznvTp/4DEocsAQC0o/PDJhaUEJiun+4uAiYJOd8OH38MyyJHp7tAcY4Aw+s+R8kKUMzRRGI/nTmWMqs5T/xpqIv3379ZDhzDMadAxBgALae7bsNa2kaAAAAAElFTkSuQmCC",
 	distributeHorizontal: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAARklEQVR42mNkoBAwUs2A/2CEIUnQAtobYOj3H0P8/CZGxsFnAIYiIgAjnDhw4ADJBjg4OCAMGBRhQDsDiApJqhhALqDYAAB9FDERg324LAAAAABJRU5ErkJggg==",
 	distributeVertical: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAATklEQVR42mNkoBAwEpD/f+DAAQYHBwdGggb8ByNMSZAB9g4O2DQyjhqAZgDFsQADhn7/4S45v4kR7ILCPnsGJDHGUQMIGEBxLJAKKDYAAJe2UhEjPBXbAAAAAElFTkSuQmCC",
@@ -62624,6 +62791,7 @@ CanvasXpress.images = {
 	exactValue: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAgElEQVR42p2T2w2AIAxFbyeDgVzACVzAgcpkyEOMYGza8kFoCKf3QCAAGX2QZV2msxQbwTiYOYcYH9ogqkELgFSAeuhdrwl0XUNo65QSzAoC4F/hE1tIoOtqVVACZgUxtkZB7KpRcAC6QiHsbZP58CSoEfINgEth3JwDML2C61tfAfWYBg2hAqkAAAAASUVORK5CYII=",
 	exp10: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAQ0lEQVR42mNkoBAwjhoAN+A/Ev8/Ek3QImQNDGiaCdEoBmBzEVEGobuAAYsBeA0mJgwY8RhMMBb+E1JDcwMIgmFgAABCAB4N7Oxl4AAAAABJRU5ErkJggg==",
 	exp2: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAARklEQVR42mNkoBAwjhoAN+A/Ev8/Eo1LHVwMWQMDmmZsNAOaOrw24TIIrwsYsBiAzWCSwgDd6RguwAf+E1JDcwMIgmFgAABJFxkREs6UWAAAAABJRU5ErkJggg==",
+	expandFolder: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAOUlEQVR42mNkQID/DKQDRkYkzYxkGPCfLgbglRumBhATnYz4DBh4Lww+A/AB6hkAM4RUwEiOrSgAAKjkJQQcORDoAAAAAElFTkSuQmCC",
 	eye: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAACB0RVh0U29mdHdhcmUATWFjcm9tZWRpYSBGaXJld29ya3MgTVi7kSokAAAAFnRFWHRDcmVhdGlvbiBUaW1lADExLzA1LzA33bqJ2wAAAvVJREFUeJyNk09oXFUYxX/3zXszGTKpCZ0kxBnapklBElsMTVtrUFQUI25SCMZiNy6kbsSNG6VYtQhZKFKsGykipVBBJEGpJKaCpkpqm0KtCa2tk0qYSWpnSDJO5s977977uWhsUxfi2X7n/PgW5ygRYb1e+OrSjkQ08o6nVK+rSGtrKPk6Ww70dCnQh8+82Hd5vV+tB7w8NjPiOWpg+maR+VKVwNy+eY6iJe7SXu9R1WZ04sCj++4BZFYqdUcv/nE9s1xJTy2s8F9qr3dpdMn21Mu29wefqDkAw+fmTv2fMMCNsiZfM+nJJX0KQL06MbtLWzn/+dVFADZtiNOXaqI7maArmcBYYcUPGZsr8OW1m3dAHVGDsXZ35IGhg59dzpc6jAiH+zo53r+dZ7cmKeQLnPjhAh+eniThCEee6WWgs5nzi0UK1RAtoKzZ4jTFIl3zpSrHnurmlYc2YUUYn5ljJpenpz1Na3OS8avzvPf1JG0NcT7t76LNE8pW4Rjd5RgrqcAIz3U0I4AVODpxDtfzOH1smOyJD9jc1srZzAJWoD4W4+297ZgwRBuTcrU1ABR9TSIawYowm8uTD4TstQzxuhiNDQkqlTJWBCvCzi33Yxe/Rbe04PihyXmO4o3J37By+4Pn9zxIpebT89oRHn59mJXSKo91ptcAcPKnS0ilRGhsLpIeeKk/tNIxtVDkm19+Z2uDx4FHdrCwVORKLk/Nr7F3cysHH99Jsepz/PtpPhqfwm3cCLH4z2rwi6leX9sLP96qACB+lTZ/mT2pJlJNGxABK0J2+S++m82wGhqcplbidTFCbXYpEeHpk2dHlnwzcKOs7zYmDJBKCQmDu733oqiGRtygig380cKhoX0uwJPJ6P4zf1avp2MqnfXXtuFFUfdtRP2riW5tFetXs8Hi/P47W/hHuz+ZGBFrB25pRdkq7FpcieCaAKdWJrQyWjg0dO+Y1qv747HtWPOuGNNrjE5rYwks2VBkWot6q/Dm4K/r/X8Dq3ySEVvXjw0AAAAASUVORK5CYII=",
 	eyeMinusIcon: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAgdJREFUeNrEU89rE1EQns3a/EDq2lgE0QQ2LQRJSA9NIIVFtOg2ggheQg+heDEnD976H+Qf6EEkILTklEMEL8bAipDASsBL7HqSBEMhRNBDShKzdPP8Zk1EevGQgwMf772d+b5582ZWEkLQIuahBW1hAQnmbmalXAJuAzoQAYKzuB9AG6gB74HBnDcXkCDw0OfzPdF1fT2Xy121LOtio9HwslPTNDsWiw1LpdK3Wq32ZTKZFMF7zXm5BD/wLJVK7dfrda1SqUQdx1kJhULe4XBEDJC8/I19HMOxzHG5sixnkPVdv9+fjEYjwTAMQ7AViy+Fpt0Ruv5A4FZi7udY5jD3AlR20+l0ENf32rbt1lUoFJDZoYOD5+55bS1OJyefae7nWOYg0S4LHDabzZXBYBD1wzhAVVUyDJO2tu65BL/fR0tL6h+BnzBwvjJX9ng8vU6nMzVN00kmk6uKoiyjXrKsTxSJbJCiBJHdou3tW65wu93u5fP5N3iLV9wVtwUQ4W6kA4HATiaTiWez2Xi3273WarWW2Z9IJE7D4XCvXC4fV6vVY3U8fntTiA+PplPBAjJwGbgCkSDErmMN46zMOkRPHWcnKsQq6rUZaJ0D0hnWJr8BT9AY+I6HP8X1u9ibf0/bOtH9x3t7N85P4eHRkSP9a1Tv/h7NF2dEm+d9yP5R+u9/4y8BBgAeV+c/GRjpjAAAAABJRU5ErkJggg==",
 	eyePlusIcon: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAkVJREFUeNqkU89rE1EQns1udhOCrk2KlxIhaaGHFPfQBFJYxFbc+gtvkQq5+uPoQfAPEHJQemnFIAFFzCFYycGLGEgVElgMRhG7OTRiKiaVKCkYSTTbbF5nYuJBDxYy8LFv3sw384b5lmOMwShmgxFt5AIcWv8wGOUg4jhCQ/gR7kHeDuIjIoN4iWgOecMCHBY4L0nSJU3TpqLR6GHDMFz5fF6koKqqZiAQaCWTya+ZTOZDp9NJIO8p9aURHIhroVDoRi6XU9Pp9LRlWWNer1dstdpAQJJIdxSjHMolTp/L8/wp7Lper9c77XabEbLZLCNLJO4zVZ1nmnaO4avYME65xCGugFWWwuGwG58vmqbZnysWi2FnC1ZX431/cnIGqtUSDOOUSxxstEQFHhYKhbFmszntQKMEn88H2awOc3Mn+wSHQwK73fenwC805HwiLm+z2b5UKpWerutWMBgcl2X5AM4LhvEe/H4FZNmN3Q1YWDgG8e4juLm5vLvyPP7ZePD2Dm2Fx1EtPGzUarXtVCr1vVwuNxRF4Z1Ou1gqvRIbjS1QlMAPj8ezdbt6Vzhz+qwrV9W/Iedq77qrSzvkEYcQHlyNG180gd8j6MuDDYF12bnIpvhxEDgzcjHiX3uyZgDPdVGGBW6gRkp0Imjv3D9yW5GfzUdOHP37+kV6/Q33X60uSqhL6R4wmCV35oIyu/H4XfG3DKEo7EvwDK5AF6W+y17vWKjqnz0AOxfEkUDY919TxxV2WXH71iYgsUhkmJBgT4ABAOtC+bduhTyuAAAAAElFTkSuQmCC",
@@ -62897,6 +63065,7 @@ CanvasXpress.images = {
 	unpin: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAC9UlEQVR42oVSa0hUQRidmbt3Tde0XA0tfKeEkhmGLygwUitRKvtRUf0INaUQbQUh6keEP3IzZUFSEUGlsAeSr9JMLS1tLSvfK3RdNc3F3dVd3W0f9965XQ1l1ayB4fDNcM6c73wDwf+W8BKyjwlzYwVAZ23KssDjxYhrvoZXr+FWPP+MekQ9TMLul2vyFhYMEovVQkEICnhyhSC+CDItWdw/Bc7IhonazGA2MqepGm1zutjdp6QBoyMBQvmg5XouiJNB8DqT+6uA+Gw50j5PwW4Jed7Yam6LiY3zV5uETFdvP8CMVUCQwmi2Ma0HnSxB6wRQQinETVdXrPndUW0XGak30LoYbtTNYQdHJ6gxEaxOrxcwFvN5uiG1hkwqJzY5IGMLXWmlCkSlppd4eoiTzQxiJikFmhloR0s6zVtu1wEps6h6h1slxrUMiKQKyNZf4VBC2Q2hnd1dX/9A5ljUfkcWkqB/XA3nJkfhPPXJYtZMRBnlZV8dD2cjQ1ch3hTiznPVPeEhgZF+XntYL8/dsGtEjSiKYrXf5YRxTllk6pZl258oIE2vJPS6MUbltqCee/HYN+WpJPFI6H2RSMQMq2jB+Mw81lBfkH566KdZOxXKKWrVG1vekIE7EX3z0bN9e31P682A/jZCQZXig4ABwmnOLz7EWha2sKXA4xftxIVTR9mWtq6cml6tdGjJlbZgAamZ12PDkg4Z9AsR+GV6ryCxDDENaet/okY7j1zFLphhufCP7zvl8u5OmaTVvc5RbHebA8TB5s+3nCeVyl8EAKO2r/Pz7ltzMDWtcjAbdH3tHR1sekbGIf7IHOEdAOUuyU5PJkp1SYmJmz5cZVVVH/wxMUF4+viwwwODDxRjiuy6xsbQqsrK/szyciRLSVmxKgVAbeKRLyZtBaZWHUjz853ELi4Dg0ND0sKiomIPDw/n2dlZhu+QA6SIZ9IYsBb8xzWwxZUMiOCgoECEUAAvMEaS5A6apnkyYPm9jMszt9qg1aZmfgNaxWeX/YISmQAAAABJRU5ErkJggg==",
 	uo: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAQElEQVR42mNkoBAw0tKA/8SoZcSjkZEYcaIU4ZPHZgChcEExhBGXxKgB5BlAjCEEoxGfIUQlJHTFBNXSNDMRBQDrbBYRul13eAAAAABJRU5ErkJggg==",
 	up: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAOUlEQVR42mNkoBAwUtOA/+RYiM0F/3HIYRUnxQCsckPLAJLDABugKBaIM3FoG/CfCDWkSZLrBZIAAD0KERHY36CdAAAAAElFTkSuQmCC",
+	upload: "data:image/png;base64,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",
 	uq: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAU0lEQVR42s1SOQ4AIAiz/3+0bgSNxSIOMtKLVNGKgwDrCheBEMpeIkU4EmLPKxsY728D9ozUwBfUAxEtcU2VsOcfiSVSzalxdoH1cGMwhWcMtj0MROcdETswwvAAAAAASUVORK5CYII=",
 	ur: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAASklEQVR42mNkoBAwUtOA/+RYiM0F/3HI/cemjxQDsMrR1QCs4vgMICa8iHLBf3zqifXC/0FjAEmBiC8W/sPkiUnKeAOTqpmJLAAAXSwXEYB8u8oAAAAASUVORK5CYII=",
 	us: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAUElEQVR42r2SSQ4AMAgCy/8fTe8mIMa0HgXHuOAsA68AFD7WGphiCKAFUOSlNgFEI9Bo8RIZ+touESj9g9EVut/4c8aqSbAbgY13tEQZa8AFDjcUEayPQ4QAAAAASUVORK5CYII=",
@@ -63058,7 +63227,7 @@ CanvasXpress.doc = {
 		},
 		"Heatmap Graphs": {
 			D: "General parameters for heatmaps",
-			P: ["heatmapAutoAdjust", "heatmapCellBox", "heatmapCellBoxColor", "heatmapCellBoxColorHighlight", "heatmapCellBoxHighlightWidth", "heatmapCellBoxWidth", "heatmapIndicatorHeight", "heatmapIndicatorHistogram", "heatmapIndicatorHistogramColor", "heatmapIndicatorPosition", "heatmapIndicatorWidth", "heatmapSeparatorWidth", "heatmapSmpSeparateBy", "heatmapVarSeparateBy", "isMultidimensionalData", "isOncoprint", "oncoprintAmplification", "oncoprintCode", "oncoprintDeletion", "showHeatmapIndicator", "smpIndicesStart", "varIndicesStart", "varTitleLabelOverlayPosition"],
+			P: ["heatmapAutoAdjust", "heatmapCellBox", "heatmapCellBoxColor", "heatmapCellBoxColorHighlight", "heatmapCellBoxHighlightWidth", "heatmapCellBoxWidth", "heatmapIndicatorHeight", "heatmapIndicatorHistogram", "heatmapIndicatorHistogramColor", "heatmapIndicatorPosition", "heatmapIndicatorWidth", "heatmapLabelSizeAutoAdjust", "heatmapSeparatorWidth", "heatmapSmpSeparateBy", "heatmapVarSeparateBy", "isMultidimensionalData", "isOncoprint", "oncoprintAmplification", "oncoprintCode", "oncoprintDeletion", "showHeatmapIndicator", "smpIndicesStart", "varIndicesStart", "varTitleLabelOverlayPosition"],
 			U: {
 				Heatmap: "true"
 			}
@@ -69505,6 +69674,13 @@ CanvasXpress.doc = {
 			C: "Filter variables by their annotation included in the 'data.z' object used in one dimensional plots",
 			D: "[]",
 			X: "getZData"
+		},
+		heatmapLabelSizeAutoAdjust: {
+			H: ['{*,"graphType":"Heatmap"}'],
+			M: "Heatmap Graphs",
+			T: "boolean",
+			C: "Flag to adjust the font size of the heatmaps labels if they overlap",
+			D: "true"
 		},
 		layoutBoxLabelColors: {
 			M: "Combination Plots",
